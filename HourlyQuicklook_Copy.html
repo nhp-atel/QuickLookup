@@ -74,6 +74,17 @@
             text-align: center;
         }
 
+        /* Copy function specific styles */
+        .copy-highlight-source {
+            background: rgba(241, 196, 15, 0.5) !important;
+            transition: all 0.5s ease;
+        }
+        
+        .copy-highlight-target {
+            background: rgba(46, 204, 113, 0.5) !important;
+            transition: all 0.5s ease;
+        }
+
     </style>
 
 </head>
@@ -108,7 +119,7 @@
                         padding: 4px;
                     }
                 </style>
-             <h2 style="color: white;">Building Hourly Quicklook</h2> 
+             <h2 style="color: white;">Building Hourly Quicklook - Copy Mode</h2> 
                 <table id="HourlyTable" class="display" style="width:100%">
 
                     <!-- This section is a half hour table without a DELTA calculation. Stored Procedure intervals need to be modified to 30 minutes if this is used.-->
@@ -957,268 +968,68 @@
 
         </style>
 
-    <!-- old button test
-            <div class="button-container">
-                <tr>
-                    <th>
-                    <button class="button2" data-criteria="" onclick="selectCriteria('')">Button</button>
-                    </th>
-
-                    <th>
-                        <button class="button2" data-criteria="" onclick="selectCriteria('')">Button</button>
-                    </th>
-
-                    <th>
-                        <button class="button2" data-criteria="" onclick="selectCriteria('')">Button</button>
-                    </th>
-
-                </tr>
-            </div>
-
-    <div class="button-container butt" style="text-align: center;">
-        <tr>
-            <th>
-                <button class="button3" id="S11" data-criteria="S11" onclick="addToOBTotal('S11')">S11</button>
-            </th>
-
-            <th>
-                <button class="button3" id="S12" data-criteria="S12" onclick="addToOBTotal('S12')">S12</button>
-            </th>
-
-            <th>
-                <button class="button3" id="S21" data-criteria="S21" onclick="addToOBTotal('S21')">S21</button>
-            </th>
-            <th>
-                <button class="button3" id="S13" data-criteria="S13" onclick="addToOBTotal('S13')">S13</button>
-            </th>
-            <th>
-                <button class="button3" id="S14" data-criteria="S14" onclick="addToOBTotal('S14')">S14</button>
-            </th>
-            <th>
-                <button class="button3" id="S22" data-criteria="S22" onclick="addToOBTotal('S22')">S22</button>
-            </th>
-            <th>
-                <button class="button3" id="S15" data-criteria="S15" onclick="addToOBTotal('S15')">S15</button>
-            </th>
-            <th>
-                <button class="button3" id="S16" data-criteria="S16" onclick="addToOBTotal('S16')">S16</button>
-            </th>
-            <th>
-                <button class="button3" id="S17" data-criteria="S17" onclick="addToOBTotal('S17')">S17</button>
-            </th>
-            <th>
-                <button class="button3" id="S18" data-criteria="S18" onclick="addToOBTotal('S18')">S18</button>
-            </th>
-            <th>
-                <button class="button3" id="S19" data-criteria="S19" onclick="addToOBTotal('S19')">S19</button>
-            </th>
-            <th>
-                <button class="button3" id="S20" data-criteria="S20" onclick="addToOBTotal('S20')">S20</button>
-            </th>
-
-
-            
-
-            <th>
-                <button class="button3" id="S01" data-criteria="S01" onclick="addToOBTotal('S01')">S1</button>
-            </th>
-            <th>
-                <button class="button3" id="S02" data-criteria="S02" onclick="addToOBTotal('S02')">S2</button>
-            </th>
-            <th>
-                <button class="button3" id="S03" data-criteria="S03" onclick="addToOBTotal('S03')">S3</button>
-            </th>
-            <th>
-                <button class="button3" id="S04" data-criteria="S04" onclick="addToOBTotal('S04')">S4</button>
-            </th>
-            <th>
-                <button class="button3" id="S05" data-criteria="S05" onclick="addToOBTotal('S05')">S5</button>
-            </th>
-            <th>
-                <button class="button3" id="S06" data-criteria="S06" onclick="addToOBTotal('S06')">S6</button>
-            </th>
-            <th>
-                <button class="button3" id="S07" data-criteria="S07" onclick="addToOBTotal('S07')">S7</button>
-            </th>
-            <th>
-                <button class="button3" id="S08" data-criteria="S08" onclick="addToOBTotal('S08')">S8</button>
-            </th>
-            <th>
-                <button class="button3" id="S09" data-criteria="S09" onclick="addToOBTotal('S09')">S9</button>
-            </th>
-            <th>
-                <button class="button3" id="S10" data-criteria="S10" onclick="addToOBTotal('S10')">S10</button>
-            </th>
-        </tr>
-    </div>
-
-    
-    <button class="dropdown-btn" id="S11" data-criteria="S11" onclick="toggleDropdown()">S11</button>
-                    <div class="dropdown-content" id="dropdownMenu">
-                        <a href="#">S1</a>
-                        <a href="#">S2</a>
-                        <a href="#">S3</a>
-                        <a href="#">S4</a>
-                        <a href="#">S5</a>
-                        <a href="#">S6</a>
-                        <a href="#">S7</a>
-                        <a href="#">S8</a>
-                        <a href="#">S9</a>
-                        <a href="#">S10</a>
-                        <a href="#">S11</a>
-                        <a href="#">S12</a>
-                        <a href="#">S13</a>
-                        <a href="#">S14</a>
-                        <a href="#">S15</a>
-                        <a href="#">S16</a>
-                        <a href="#">S17</a>
-                        <a href="#">S18</a>
-                        <a href="#">S19</a>
-                        <a href="#">S20</a>
-                        <a href="#">S21</a>
-                        <a href="#">S22</a>
-                    </div>
-
-    -->
     </table>
 
 </div>
-<!--
-     <div class="dropdown" style="text-align: center;">
-        <tr>
-            <th>
-                <button class="dropdown-btn" id="S11" data-criteria="S11" onclick="toggleDropdown()">S11</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S12" data-criteria="S12" onclick="toggleDropdown()">S12</button>
-            </th>
-
-            <th>
-                <button class="dropdown-btn" id="S21" data-criteria="S21" onclick="toggleDropdown()">S21</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S13" data-criteria="S13" onclick="toggleDropdown()">S13</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S14" data-criteria="S14" onclick="toggleDropdown()">S14</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S22" data-criteria="S22" onclick="toggleDropdown()">S22</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S15" data-criteria="S15" onclick="toggleDropdown()">S15</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S16" data-criteria="S16" onclick="toggleDropdown()">S16</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S17" data-criteria="S17" onclick="toggleDropdown()">S17</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S18" data-criteria="S18" onclick="toggleDropdown()">S18</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S19" data-criteria="S19" onclick="toggleDropdown()">S19</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S20" data-criteria="S20" onclick="toggleDropdown()">S20</button>
-                
-            </th>
-
-
-            
-
-            <th>
-                <button class="dropdown-btn" id="S01" data-criteria="S01" onclick="toggleDropdown()">S1</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S02" data-criteria="S02" onclick="toggleDropdown()">S2</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S03" data-criteria="S03" onclick="toggleDropdown()">S3</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S04" data-criteria="S04" onclick="toggleDropdown()">S4</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S05" data-criteria="S05" onclick="toggleDropdown()">S5</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S06" data-criteria="S06" onclick="toggleDropdown()">S6</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S07" data-criteria="S07" onclick="toggleDropdown()">S7</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S08" data-criteria="S08" onclick="toggleDropdown()">S8</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S09" data-criteria="S09" onclick="toggleDropdown()">S9</button>
-            </th>
-            <th>
-                <button class="dropdown-btn" id="S10" data-criteria="S10" onclick="toggleDropdown()">S10</button>
-            </th>
-
-        </tr>
-    </div> 
--->
 
 <div class="controls" style="margin-left: auto; margin-right: auto; text-align: center;">
-    <label for="sourceSelect" style="color: #fff;">Source:</label>
+    <label for="sourceSelect" style="color: #fff;">📤 Source:</label>
     <select id="sourceSelect">
-        <option id="S01_Vol" value="S01_Vol">S1</option>
-        <option id="S02_Vol" value="S02_Vol">S2</option>
-        <option id="S03_Vol" value="S03_Vol">S3</option>
-        <option id="S04_Vol" value="S04_Vol">S4</option>
-        <option id="S05_Vol" value="S05_Vol">S5</option>
-        <option id="S06_Vol" value="S06_Vol">S6</option>
-        <option id="S07_Vol" value="S07_Vol">S7</option>
-        <option id="S08_Vol" value="S08_Vol">S8</option>
-        <option id="S09_Vol" value="S09_Vol">S9</option>
-        <option id="S10_Vol" value="S10_Vol">S10</option>
-        <option id="S11_Vol" value="S11_Vol">S11</option>
-        <option id="S12_Vol" value="S12_Vol">S12</option>
-        <option id="S13_Vol" value="S13_Vol">S13</option>
-        <option id="S14_Vol" value="S14_Vol">S14</option>
-        <option id="S15_Vol" value="S15_Vol">S15</option>
-        <option id="S16_Vol" value="S16_Vol">S16</option>
-        <option id="S17_Vol" value="S17_Vol">S17</option>
-        <option id="S18_Vol" value="S18_Vol">S18</option>
-        <option id="S19_Vol" value="S19_Vol">S19</option>
-        <option id="S20_Vol" value="S20_Vol">S20</option>
-        <option id="S21_Vol" value="S21_Vol">S21</option>
-        <option id="S22_Vol" value="S22_Vol">S22</option>
+        <option value="S01_Vol">S1</option>
+        <option value="S02_Vol">S2</option>
+        <option value="S03_Vol">S3</option>
+        <option value="S04_Vol">S4</option>
+        <option value="S05_Vol">S5</option>
+        <option value="S06_Vol">S6</option>
+        <option value="S07_Vol">S7</option>
+        <option value="S08_Vol">S8</option>
+        <option value="S09_Vol">S9</option>
+        <option value="S10_Vol">S10</option>
+        <option value="S11_Vol">S11</option>
+        <option value="S12_Vol">S12</option>
+        <option value="S13_Vol">S13</option>
+        <option value="S14_Vol">S14</option>
+        <option value="S15_Vol">S15</option>
+        <option value="S16_Vol">S16</option>
+        <option value="S17_Vol">S17</option>
+        <option value="S18_Vol">S18</option>
+        <option value="S19_Vol">S19</option>
+        <option value="S20_Vol">S20</option>
+        <option value="S21_Vol">S21</option>
+        <option value="S22_Vol">S22</option>
 
     </select>
 
-    <label for="targetSelect" style="color: #fff;">Target:</label>
+    <span style="color: #fff; font-size: 1.2rem; margin: 0 10px;">→</span>
+
+    <label for="targetSelect" style="color: #fff;">📥 Target:</label>
     <select id="targetSelect">
-        <option id="S01_Vol" value="S01_Vol">S1</option>
-        <option id="S02_Vol" value="S02_Vol">S2</option>
-        <option id="S03_Vol" value="S03_Vol">S3</option>
-        <option id="S04_Vol" value="S04_Vol">S4</option>
-        <option id="S05_Vol" value="S05_Vol">S5</option>
-        <option id="S06_Vol"  value="S06_Vol">S6</option>
-        <option id="S07_Vol" value="S07_Vol">S7</option>
-        <option id="S08_Vol" value="S08_Vol">S8</option>
-        <option id="S09_Vol" value="S09_Vol">S9</option>
-        <option id="S10_Vol" value="S10_Vol">S10</option>
-        <option id="S11_Vol" value="S11_Vol">S11</option>
-        <option id="S12_Vol" value="S12_Vol">S12</option>
-        <option id="S13_Vol" value="S13_Vol">S13</option>
-        <option id="S14_Vol" value="S14_Vol">S14</option>
-        <option id="S15_Vol" value="S15_Vol">S15</option>
-        <option id="S16_Vol" value="S16_Vol">S16</option>
-        <option id="S17_Vol" value="S17_Vol">S17</option>
-        <option id="S18_Vol" value="S18_Vol">S18</option>
-        <option id="S19_Vol" value="S19_Vol">S19</option>
-        <option id="S20_Vol" value="S20_Vol">S20</option>
-        <option id="S21_Vol" value="S21_Vol">S21</option>
-        <option id="S22_Vol" value="S22_Vol">S22</option>
+        <option value="S01_Vol">S1</option>
+        <option value="S02_Vol">S2</option>
+        <option value="S03_Vol">S3</option>
+        <option value="S04_Vol">S4</option>
+        <option value="S05_Vol">S5</option>
+        <option value="S06_Vol"  value="S06_Vol">S6</option>
+        <option value="S07_Vol">S7</option>
+        <option value="S08_Vol">S8</option>
+        <option value="S09_Vol">S9</option>
+        <option value="S10_Vol">S10</option>
+        <option value="S11_Vol">S11</option>
+        <option value="S12_Vol">S12</option>
+        <option value="S13_Vol">S13</option>
+        <option value="S14_Vol">S14</option>
+        <option value="S15_Vol">S15</option>
+        <option value="S16_Vol">S16</option>
+        <option value="S17_Vol">S17</option>
+        <option value="S18_Vol">S18</option>
+        <option value="S19_Vol">S19</option>
+        <option value="S20_Vol">S20</option>
+        <option value="S21_Vol">S21</option>
+        <option value="S22_Vol">S22</option>
 
     </select>
 
-    <button onclick="transferValue()">Transfer</button>
+    <button onclick="transferValue()" style="background: #e67e22; padding: 10px 20px; margin-left: 10px;">📋 COPY</button>
 </div>
 
 <!-- New edits | 10/8/24 | W.Rodriguez -->
@@ -1418,9 +1229,20 @@
                 return;
             }
 
-            // Perform the SWAP - exchange the values
+            // Highlight the cells during copy
+            sourceCell.classList.add('copy-highlight-source');
+            targetCell.classList.add('copy-highlight-target');
+
+            setTimeout(() => {
+                sourceCell.classList.remove('copy-highlight-source');
+                targetCell.classList.remove('copy-highlight-target');
+            }, 1500);
+
+            // Perform the COPY - source stays the same, target gets source value
             targetCell.textContent = sourceValue === 0 ? "&nbsp;" : sourceValue.toLocaleString();
-            sourceCell.textContent = targetValue === 0 ? "&nbsp;" : targetValue.toLocaleString();
+            // SOURCE REMAINS UNCHANGED - this is the key difference
+
+            alert(`Copied ${sourceValue.toLocaleString()} from ${sourceLabel.replace('_Vol', '')} to ${targetLabel.replace('_Vol', '')}. Source remains unchanged.`);
         }
 
     
@@ -1677,243 +1499,6 @@
 
                 window.print();
             }
-
-
-        /*
-
-         // Dropdown test edit - 9/3/25
-
-            const sourceDropdown = document.getElementById('sourceSelect');
-            const targetDropdown = document.getElementById('targetSelect');
-            const tableBody = document.getElementsByClassName('.volSwap');
-
-            function addValues() {
-
-                const sourceIndex = parseInt(sourceDropdown.value);
-                const targetIndex = parseInt(targetDropdown.value);
-
-                    if (sourceIndex === targetIndex) {
-                        alert("Source and target must be different.");
-                        return;
-                    }
-
-                const sourceCell = document.getElementById(`cell-${sourceIndex}`);
-                const targetCell = document.getElementById(`cell-${targetIndex}`);
-
-                const sourceValue = parseInt(sourceCell.textContent);
-                const targetValue = parseInt(targetCell.textContent);
-
-                targetCell.textContent = targetValue + sourceValue;
-                sourceCell.textContent = 0;
-
-                updateSum(".volSwap");
-            }
-
-            function updateSum(tableId) {
-                const table = document.getElementsByClassName(tableId);
-                const cells = table.rows[0].cells;
-                let sum = 0;
-
-                for (let i = 0; i < cells.length - 1; i++) {
-                sum += parseInt(cells[i].textContent);
-                }
-
-                document.getElementById(sumCellId).textContent = sum;
-            }
-
-            // Dropdown test edit - 9/3/25
-        
-        */
-
-
-        /*
-            function transferValue() {
-                const sourceIndex = document.getElementById("sourceSelect").value;
-                const targetIndex = document.getElementById("targetSelect").value;
-
-                const sourceRow = document.getElementById("sourceTable").rows[parseInt(sourceIndex) + 1];
-                const targetRow = document.getElementById("targetTable").rows[parseInt(targetIndex) + 1];
-
-                const sourceValueCell = sourceRow.querySelector(".value");
-                
-
-                const targetValueCell = targetRow.querySelector(".value");
-                
-
-                const valueToTransfer = parseInt(sourceValueCell.textContent);
-
-                // Add value to target
-                const newTargetValue = parseInt(targetValueCell.textContent) + valueToTransfer;
-                targetValueCell.textContent = newTargetValue;
-               
-
-                // Reset source value to 0 and update sum
-                sourceValueCell.textContent = 0;
-                
-            }
-        */
-
-
-        /*
-
-        function transferValue() {
-
-            const sourceId = document.getElementById("sourceSelect").value;
-            const targetId = document.getElementById("targetSelect").value;
-
-            const sourceCell = document.getElementById(sourceId);
-            const targetCell = document.getElementById(targetId);
-
-            const sourceValue = parseInt(sourceCell.textContent);
-            const targetValue = parseInt(targetCell.textContent);
-
-            // Add source value to target
-            targetCell.textContent = targetValue + sourceValue;
-
-            // Reset source cell to 0 (or keep it if you prefer)
-            sourceCell.textContent = 0;
-
-            updateSum("sourceTable", "sourceSum");
-            updateSum("targetTable", "targetSum");
-        }
-
-        function updateSum(tableId, sumCellId) {
-            const table = document.getElementById(tableId);
-            const cells = table.rows[0].cells;
-            let sum = 0;
-
-            for (let i = 0; i < cells.length - 1; i++) {
-            sum += parseInt(cells[i].textContent);
-            }
-
-            document.getElementById(sumCellId).textContent = sum;
-        }
-
-        */
-
-
-
-        /*
-            function toggleDropdown() {
-                const dropdown = document.getElementById("dropdownMenu");
-                dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-            }
-
-            // Optional: Close dropdown if clicked outside
-            window.onclick = function (event) {
-                if (!event.target.matches('.dropdown-btn')) {
-                    const dropdowns = document.getElementsByClassName("dropdown-content");
-                    for (let i = 0; i < dropdowns.length; i++) {
-                        dropdowns[i].style.display = "none";
-                    }
-                }
-            };
-        */
-            
-        /*
-            function addToOBTotal(module) {
-
-                selectedMod = module;
-
-                var northCFTotal = document.getElementById('North_CF').innerText;
-                var S01cf = document.getElementById('S01_CF').innerText;
-
-                //var cellData = northCFTotal.rows[0].cells[7].innerHTML;
-                        
-                if (selectedMod == "S01"){
-
-                    northCFTotal += S01cf;
-                    $('#S01_CF').text("");
-                    //$(this).text("");
-
-                }
-                //obTotal += module;
-                $('.button').removeClass('active');
-                $('button[data-criteria="' + module + '"]').addClass('active');
-                // Reload data based on the selected criteria
-                //loadOutboundValuesTEST($("#sortSel").val(), selectedMod);
-                loadOutboundValues($("#sortSel").val(), criteria);
-            }
-
-            function loadOutboundValuesTEST(SortID, Criteria) {
-
-                //Load the hourly values
-                $.ajax({
-                url: "HourlyQuicklookServer_DATA.aspx?sortid=" + SortID + "&hourid=" + Criteria,
-                success: function(data) {
-                //Clear the table from current values
-
-
-
-                        //Clear the table from current values
-                        $('#South tr').each(function(index) {
-
-                            if (index!=0 && index!=1 && index!=8) {
-                                $.each(this.cells, function(index) {
-                                    if (index < 6) {
-                                        $(this).text("");
-                                    }
-
-                                });
-
-                            }
-                        });
-
-                        //Clear the table from current values
-                        $('#North tr').each(function(index) {
-
-                            if (index!=0 && index!=1 && index!=8) {
-                                $.each(this.cells, function(index) {
-                                    if (index > 0) {
-                                        $(this).text("");
-                                    }
-
-                                });
-
-                            }
-                        });
-                    }
-                });
-            }
-
-        */
-
-
-        /*
-
-            var hourlyTableLoad = $('#HourlyTable').DataTable({
-
-                dom: 'Bfrtip',
-                searching: true,
-                paging: false,
-                info: false,
-                buttons: ['copy', {
-                    extend: 'csv',
-                    text: 'Excel'
-                }, 'pdf', 'print'],
-                "order": [],
-                "ajax": {
-                    "url": "HourlyQuicklookServer_DATA.aspx",
-                    "dataSrc": ""
-                },
-                scrollY: "450px",
-                scrollX: true,
-                scrollCollapse: true,
-                fixedColumns: {
-                    left: 1
-                },
-
-            }
-
-            function loadHourly() {
-
-                    //console.log("loading")
-
-                    hourlyTableLoad.ajax.reload(null, false);
-
-            }
-
-        */
 
         
     </script>

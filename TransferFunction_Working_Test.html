@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transfer Function - Working Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 1200px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+        
+        table { 
+            border-collapse: collapse; 
+            margin: 20px 0; 
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        td, th { 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            padding: 12px 15px; 
+            text-align: center; 
+        }
+        
+        th { 
+            background: rgba(52, 152, 219, 0.8);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .controls { 
+            margin: 20px 0; 
+            padding: 20px; 
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .test-section { 
+            margin: 20px 0; 
+            padding: 15px; 
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        button { 
+            padding: 10px 20px; 
+            margin: 5px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+        
+        select { 
+            padding: 8px 15px; 
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            background: #34495e;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .volume-cell {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .transfer-log {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            padding: 8px;
+            margin: 5px 0;
+            background: rgba(39, 174, 96, 0.2);
+            border-radius: 5px;
+            border-left: 3px solid #27ae60;
+        }
+        
+        .highlight {
+            background: rgba(241, 196, 15, 0.3) !important;
+            transition: all 0.5s ease;
+        }
+        
+        .title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">🔄 Swap Function Working Test</h1>
+        
+        <div class="test-section">
+            <h2>🎛️ Test Data Controls</h2>
+            <button onclick="addTestData()">📊 Add Test Data</button>
+            <button onclick="clearAllData()">🗑️ Clear All Data</button>
+            <button onclick="addFormattedData()">💰 Add Big Numbers</button>
+            <button onclick="demonstrateTransfer()">🚀 Demo Transfer</button>
+        </div>
+
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 300px;">
+                <h2>🟦 North Modules (S11-S15)</h2>
+                <table>
+                    <tr>
+                        <th>Module</th>
+                        <th>Volume</th>
+                    </tr>
+                    <tr>
+                        <td><strong>S11</strong></td>
+                        <td id="S11_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S12</strong></td>
+                        <td id="S12_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S13</strong></td>
+                        <td id="S13_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S14</strong></td>
+                        <td id="S14_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S15</strong></td>
+                        <td id="S15_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="flex: 1; min-width: 300px;">
+                <h2>🟩 South Modules (S01-S05)</h2>
+                <table>
+                    <tr>
+                        <th>Module</th>
+                        <th>Volume</th>
+                    </tr>
+                    <tr>
+                        <td><strong>S01</strong></td>
+                        <td id="S01_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S02</strong></td>
+                        <td id="S02_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S03</strong></td>
+                        <td id="S03_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S04</strong></td>
+                        <td id="S04_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S05</strong></td>
+                        <td id="S05_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="controls">
+            <label style="font-weight: bold;">🔄 Source:</label>
+            <select id="sourceSelect">
+                <option value="S01_Vol">S01 (South)</option>
+                <option value="S02_Vol">S02 (South)</option>
+                <option value="S03_Vol">S03 (South)</option>
+                <option value="S04_Vol">S04 (South)</option>
+                <option value="S05_Vol">S05 (South)</option>
+                <option value="S11_Vol">S11 (North)</option>
+                <option value="S12_Vol">S12 (North)</option>
+                <option value="S13_Vol">S13 (North)</option>
+                <option value="S14_Vol">S14 (North)</option>
+                <option value="S15_Vol">S15 (North)</option>
+            </select>
+
+            <label style="font-weight: bold;">🎯 Target:</label>
+            <select id="targetSelect">
+                <option value="S01_Vol">S01 (South)</option>
+                <option value="S02_Vol">S02 (South)</option>
+                <option value="S03_Vol">S03 (South)</option>
+                <option value="S04_Vol">S04 (South)</option>
+                <option value="S05_Vol">S05 (South)</option>
+                <option value="S11_Vol">S11 (North)</option>
+                <option value="S12_Vol">S12 (North)</option>
+                <option value="S13_Vol">S13 (North)</option>
+                <option value="S14_Vol">S14 (North)</option>
+                <option value="S15_Vol">S15 (North)</option>
+            </select>
+
+            <button onclick="transferValue()" style="background: #e74c3c; font-size: 1.1em;">
+                🔄 SWAP NOW
+            </button>
+        </div>
+
+        <div class="transfer-log">
+            <h3>📋 Swap History</h3>
+            <div id="transferLogContent">
+                <em>No swaps yet. Click "SWAP NOW" to see the magic! ✨</em>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Quick Tests</h2>
+            <button onclick="testBasicTransfer()">Test: S11 ↔ S01</button>
+            <button onclick="testEmptyTransfer()">Test: Empty Cell Swap</button>
+            <button onclick="testSameModule()">Test: Same Module (Error)</button>
+            <button onclick="testBigNumbers()">Test: Large Number Swap</button>
+        </div>
+    </div>
+
+    <script>
+        // WORKING SWAP FUNCTION
+        function transferValue() {
+            const sourceLabel = document.getElementById("sourceSelect").value;
+            const targetLabel = document.getElementById("targetSelect").value;
+
+            console.log("Swap initiated:", sourceLabel, "↔", targetLabel);
+
+            if (sourceLabel === targetLabel) {
+                showAlert("❌ Source and target must be different!", "error");
+                return;
+            }
+
+            // Find the actual table cells by ID
+            const sourceCell = document.getElementById(sourceLabel);
+            const targetCell = document.getElementById(targetLabel);
+
+            console.log("Source cell:", sourceCell);
+            console.log("Target cell:", targetCell);
+
+            if (!sourceCell || !targetCell) {
+                showAlert("❌ Could not find source or target cell!", "error");
+                return;
+            }
+
+            // Get values, handling &nbsp; and empty cases
+            const sourceText = sourceCell.textContent.trim();
+            const targetText = targetCell.textContent.trim();
+
+            console.log("Source text:", `"${sourceText}"`);
+            console.log("Target text:", `"${targetText}"`);
+
+            // Handle &nbsp; (both regular space and non-breaking space), empty strings, and formatted numbers
+            const sourceValue = (sourceText === "" || sourceText === "\u00A0" || sourceText === "&nbsp;") ? 0 : parseInt(sourceText.replace(/,/g, ''));
+            const targetValue = (targetText === "" || targetText === "\u00A0" || targetText === "&nbsp;") ? 0 : parseInt(targetText.replace(/,/g, ''));
+
+            console.log("Source value:", sourceValue);
+            console.log("Target value:", targetValue);
+
+            if (isNaN(sourceValue) || isNaN(targetValue)) {
+                showAlert("❌ Invalid values found in source or target cells!", "error");
+                return;
+            }
+
+            // Highlight the cells being swapped
+            sourceCell.classList.add('highlight');
+            targetCell.classList.add('highlight');
+
+            setTimeout(() => {
+                sourceCell.classList.remove('highlight');
+                targetCell.classList.remove('highlight');
+            }, 1000);
+
+            // Perform the SWAP - exchange the values
+            targetCell.textContent = sourceValue === 0 ? "&nbsp;" : sourceValue.toLocaleString();
+            sourceCell.textContent = targetValue === 0 ? "&nbsp;" : targetValue.toLocaleString();
+
+            // Log the swap
+            logSwap(sourceLabel, targetLabel, sourceValue, targetValue);
+
+            // Show success message
+            showAlert(`🔄 Swapped ${sourceLabel.replace('_Vol', '')} (${sourceValue.toLocaleString()}) ↔ ${targetLabel.replace('_Vol', '')} (${targetValue.toLocaleString()})!`, "success");
+        }
+
+        function logSwap(source, target, sourceVal, targetVal) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            
+            logEntry.innerHTML = `
+                <strong>[${timestamp}]</strong> 
+                Swap: <strong>${source.replace('_Vol', '')}</strong> (${sourceVal.toLocaleString()}) ↔ 
+                <strong>${target.replace('_Vol', '')}</strong> (${targetVal.toLocaleString()})
+                <br><small style="color: #95a5a6;">Result: ${source.replace('_Vol', '')} = ${targetVal.toLocaleString()}, ${target.replace('_Vol', '')} = ${sourceVal.toLocaleString()}</small>
+            `;
+
+            const container = document.getElementById('transferLogContent');
+            
+            // Clear the "no swaps" message if it's the first swap
+            if (container.innerHTML.includes('No swaps yet')) {
+                container.innerHTML = '';
+            }
+            
+            container.insertBefore(logEntry, container.firstChild);
+
+            // Keep only last 10 entries
+            while (container.children.length > 10) {
+                container.removeChild(container.lastChild);
+            }
+        }
+
+        function showAlert(message, type = "info") {
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : '#3498db'};
+                color: white;
+                border-radius: 8px;
+                z-index: 1000;
+                font-weight: bold;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            `;
+            alertDiv.textContent = message;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => alertDiv.style.transform = 'translateX(0)', 100);
+            setTimeout(() => {
+                alertDiv.style.transform = 'translateX(100%)';
+                setTimeout(() => document.body.removeChild(alertDiv), 300);
+            }, 3000);
+        }
+
+        // TEST HELPER FUNCTIONS
+        function addTestData() {
+            document.getElementById("S01_Vol").textContent = "1,250";
+            document.getElementById("S02_Vol").textContent = "2,500";
+            document.getElementById("S03_Vol").textContent = "&nbsp;"; // Empty
+            document.getElementById("S04_Vol").textContent = "750";
+            document.getElementById("S05_Vol").textContent = ""; // Also empty
+            
+            document.getElementById("S11_Vol").textContent = "3,200";
+            document.getElementById("S12_Vol").textContent = "1,800";
+            document.getElementById("S13_Vol").textContent = "&nbsp;"; // Empty
+            document.getElementById("S14_Vol").textContent = "950";
+            document.getElementById("S15_Vol").textContent = "4,100";
+            
+            showAlert("📊 Test data loaded successfully!", "success");
+        }
+
+        function addFormattedData() {
+            document.getElementById("S01_Vol").textContent = "12,345";
+            document.getElementById("S02_Vol").textContent = "67,890";
+            document.getElementById("S11_Vol").textContent = "98,765";
+            document.getElementById("S12_Vol").textContent = "123,456";
+            
+            showAlert("💰 Big numbers loaded!", "success");
+        }
+
+        function clearAllData() {
+            const cells = ["S01_Vol", "S02_Vol", "S03_Vol", "S04_Vol", "S05_Vol", 
+                          "S11_Vol", "S12_Vol", "S13_Vol", "S14_Vol", "S15_Vol"];
+            cells.forEach(id => {
+                document.getElementById(id).textContent = "&nbsp;";
+            });
+            
+            document.getElementById("transferLogContent").innerHTML = '<em>No swaps yet. Click "SWAP NOW" to see the magic! ✨</em>';
+            showAlert("🗑️ All data cleared!", "info");
+        }
+
+        function demonstrateTransfer() {
+            addTestData();
+            setTimeout(() => {
+                document.getElementById("sourceSelect").value = "S11_Vol";
+                document.getElementById("targetSelect").value = "S01_Vol";
+                showAlert("🎯 Demo setup: S11 ↔ S01. Click SWAP NOW!", "info");
+            }, 500);
+        }
+
+        // QUICK TEST FUNCTIONS
+        function testBasicTransfer() {
+            addTestData();
+            setTimeout(() => {
+                document.getElementById("sourceSelect").value = "S11_Vol";
+                document.getElementById("targetSelect").value = "S01_Vol";
+                transferValue();
+            }, 500);
+        }
+
+        function testEmptyTransfer() {
+            clearAllData();
+            setTimeout(() => {
+                document.getElementById("sourceSelect").value = "S03_Vol"; // Empty
+                document.getElementById("targetSelect").value = "S04_Vol"; // Empty
+                transferValue();
+            }, 500);
+        }
+
+        function testSameModule() {
+            document.getElementById("sourceSelect").value = "S11_Vol";
+            document.getElementById("targetSelect").value = "S11_Vol";
+            transferValue();
+        }
+
+        function testBigNumbers() {
+            addFormattedData();
+            setTimeout(() => {
+                document.getElementById("sourceSelect").value = "S12_Vol";
+                document.getElementById("targetSelect").value = "S02_Vol";
+                transferValue();
+            }, 500);
+        }
+
+        // Initialize with some test data on load
+        window.onload = function() {
+            showAlert("🎉 Swap Function Test Ready! Click 'Add Test Data' to begin.", "info");
+        };
+    </script>
+</body>
+</html>
