@@ -5,20 +5,23 @@
     <style>
         body { 
             font-family: Arial, sans-serif; 
-            margin: 20px; 
+            margin: 0;
+            padding: 20px; 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             min-height: 100vh;
+            box-sizing: border-box;
         }
         
         .container {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border-radius: 15px;
-            padding: 30px;
-            margin: 20px auto;
-            max-width: 1200px;
+            padding: 40px;
+            margin: 0 auto;
+            max-width: 1400px;
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            width: 100%;
         }
         
         table { 
@@ -55,8 +58,13 @@
         }
         
         .test-section { 
+<<<<<<< HEAD
             margin: 20px 0; 
             padding: 15px; 
+=======
+            margin: 30px 0; 
+            padding: 25px; 
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             text-align: center;
@@ -129,9 +137,34 @@
         .title {
             text-align: center;
             font-size: 2.5rem;
+<<<<<<< HEAD
             margin-bottom: 30px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
+=======
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .controls label, .controls select, .controls button {
+                margin: 8px 0;
+            }
+        }
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
 
         .arrow-animation {
             display: inline-block;
@@ -157,9 +190,15 @@
             <button onclick="demonstrateCopy()">🚀 Demo Copy</button>
         </div>
 
+<<<<<<< HEAD
         <div style="display: flex; gap: 20px; flex-wrap: wrap;">
             <div style="flex: 1; min-width: 300px;">
                 <h2>🟦 North Modules (S11-S15)</h2>
+=======
+        <div style="display: flex; gap: 30px; flex-wrap: wrap; margin: 40px 0;">
+            <div style="flex: 1; min-width: 350px;">
+                <h2 style="margin-bottom: 20px;">🟦 North Modules (S11-S22)</h2>
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
                 <table>
                     <tr>
                         <th>Module</th>
@@ -174,6 +213,13 @@
                         <td id="S12_Vol" class="volume-cell">&nbsp;</td>
                     </tr>
                     <tr>
+<<<<<<< HEAD
+=======
+                        <td><strong>S21</strong></td>
+                        <td id="S21_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
                         <td><strong>S13</strong></td>
                         <td id="S13_Vol" class="volume-cell">&nbsp;</td>
                     </tr>
@@ -182,6 +228,7 @@
                         <td id="S14_Vol" class="volume-cell">&nbsp;</td>
                     </tr>
                     <tr>
+<<<<<<< HEAD
                         <td><strong>S15</strong></td>
                         <td id="S15_Vol" class="volume-cell">&nbsp;</td>
                     </tr>
@@ -190,6 +237,40 @@
 
             <div style="flex: 1; min-width: 300px;">
                 <h2>🟩 South Modules (S01-S05)</h2>
+=======
+                        <td><strong>S22</strong></td>
+                        <td id="S22_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S15</strong></td>
+                        <td id="S15_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S16</strong></td>
+                        <td id="S16_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S17</strong></td>
+                        <td id="S17_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S18</strong></td>
+                        <td id="S18_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S19</strong></td>
+                        <td id="S19_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S20</strong></td>
+                        <td id="S20_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div style="flex: 1; min-width: 350px;">
+                <h2 style="margin-bottom: 20px;">🟩 South Modules (S01-S10)</h2>
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
                 <table>
                     <tr>
                         <th>Module</th>
@@ -215,6 +296,29 @@
                         <td><strong>S05</strong></td>
                         <td id="S05_Vol" class="volume-cell">&nbsp;</td>
                     </tr>
+<<<<<<< HEAD
+=======
+                    <tr>
+                        <td><strong>S06</strong></td>
+                        <td id="S06_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S07</strong></td>
+                        <td id="S07_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S08</strong></td>
+                        <td id="S08_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S09</strong></td>
+                        <td id="S09_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><strong>S10</strong></td>
+                        <td id="S10_Vol" class="volume-cell">&nbsp;</td>
+                    </tr>
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
                 </table>
             </div>
         </div>
@@ -227,11 +331,29 @@
                 <option value="S03_Vol">S03 (South)</option>
                 <option value="S04_Vol">S04 (South)</option>
                 <option value="S05_Vol">S05 (South)</option>
+<<<<<<< HEAD
+=======
+                <option value="S06_Vol">S06 (South)</option>
+                <option value="S07_Vol">S07 (South)</option>
+                <option value="S08_Vol">S08 (South)</option>
+                <option value="S09_Vol">S09 (South)</option>
+                <option value="S10_Vol">S10 (South)</option>
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
                 <option value="S11_Vol">S11 (North)</option>
                 <option value="S12_Vol">S12 (North)</option>
                 <option value="S13_Vol">S13 (North)</option>
                 <option value="S14_Vol">S14 (North)</option>
                 <option value="S15_Vol">S15 (North)</option>
+<<<<<<< HEAD
+=======
+                <option value="S16_Vol">S16 (North)</option>
+                <option value="S17_Vol">S17 (North)</option>
+                <option value="S18_Vol">S18 (North)</option>
+                <option value="S19_Vol">S19 (North)</option>
+                <option value="S20_Vol">S20 (North)</option>
+                <option value="S21_Vol">S21 (North)</option>
+                <option value="S22_Vol">S22 (North)</option>
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
             </select>
 
             <span class="arrow-animation" style="font-size: 1.5rem;">→</span>
@@ -243,22 +365,50 @@
                 <option value="S03_Vol">S03 (South)</option>
                 <option value="S04_Vol">S04 (South)</option>
                 <option value="S05_Vol">S05 (South)</option>
+<<<<<<< HEAD
+=======
+                <option value="S06_Vol">S06 (South)</option>
+                <option value="S07_Vol">S07 (South)</option>
+                <option value="S08_Vol">S08 (South)</option>
+                <option value="S09_Vol">S09 (South)</option>
+                <option value="S10_Vol">S10 (South)</option>
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
                 <option value="S11_Vol">S11 (North)</option>
                 <option value="S12_Vol">S12 (North)</option>
                 <option value="S13_Vol">S13 (North)</option>
                 <option value="S14_Vol">S14 (North)</option>
                 <option value="S15_Vol">S15 (North)</option>
+<<<<<<< HEAD
             </select>
 
             <button onclick="transferValue()" style="background: #e67e22; font-size: 1.1em;">
                 📋 COPY NOW
+=======
+                <option value="S16_Vol">S16 (North)</option>
+                <option value="S17_Vol">S17 (North)</option>
+                <option value="S18_Vol">S18 (North)</option>
+                <option value="S19_Vol">S19 (North)</option>
+                <option value="S20_Vol">S20 (North)</option>
+                <option value="S21_Vol">S21 (North)</option>
+                <option value="S22_Vol">S22 (North)</option>
+            </select>
+
+            <button onclick="transferValue()" style="background: #e67e22; font-size: 1.1em;">
+                📋 TRANSFER NOW
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
             </button>
         </div>
 
         <div class="transfer-log">
+<<<<<<< HEAD
             <h3>📋 Copy History</h3>
             <div id="transferLogContent">
                 <em>No copies yet. Click "COPY NOW" to see the magic! ✨</em>
+=======
+            <h3>📋 Transfer History</h3>
+            <div id="transferLogContent">
+                <em>No transfers yet. Click "TRANSFER NOW" to see the magic! ✨</em>
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
             </div>
         </div>
 
@@ -270,16 +420,28 @@
             <button onclick="testBigNumbers()">Test: Large Number Copy</button>
         </div>
 
+<<<<<<< HEAD
         <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; margin-top: 20px;">
             <h3>📖 How Copy Works:</h3>
             <p><strong>📤 Source:</strong> Data is <span style="color: #f39c12;">read from</span> but <strong>remains unchanged</strong></p>
             <p><strong>📥 Target:</strong> Data is <span style="color: #e74c3c;">overwritten</span> with source data</p>
             <p><strong>Example:</strong> S11=1000, S01=500 → Copy S11→S01 → S11=<span style="color: #f39c12;">1000</span> (unchanged), S01=<span style="color: #2ecc71;">1000</span> (copied)</p>
+=======
+        <div style="background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 10px; margin-top: 40px;">
+            <h3 style="margin-bottom: 20px;">📖 How Transfer Works:</h3>
+            <p style="margin: 15px 0; font-size: 1.1em;"><strong>📤 Source:</strong> Data is <span style="color: #f39c12;">transferred out</span> and <strong>becomes 0</strong></p>
+            <p style="margin: 15px 0; font-size: 1.1em;"><strong>📥 Target:</strong> Data is <span style="color: #e74c3c;">overwritten</span> with source data</p>
+            <p style="margin: 15px 0; font-size: 1.1em;"><strong>Example:</strong> S11=1000, S01=500 → Transfer S11→S01 → S11=<span style="color: #e74c3c;">0</span> (emptied), S01=<span style="color: #2ecc71;">1000</span> (received)</p>
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
         </div>
     </div>
 
     <script>
+<<<<<<< HEAD
         // WORKING COPY FUNCTION
+=======
+        // WORKING TRANSFER FUNCTION
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
         function transferValue() {
             const sourceLabel = document.getElementById("sourceSelect").value;
             const targetLabel = document.getElementById("targetSelect").value;
@@ -331,15 +493,25 @@
                 targetCell.classList.remove('target-highlight');
             }, 1500);
 
+<<<<<<< HEAD
             // Perform the COPY - source stays the same, target gets source value
             targetCell.textContent = sourceValue === 0 ? "&nbsp;" : sourceValue.toLocaleString();
             // SOURCE REMAINS UNCHANGED - this is the key difference
+=======
+            // Perform the COPY/TRANSFER - source becomes 0, target gets source value
+            targetCell.textContent = sourceValue === 0 ? "&nbsp;" : sourceValue.toLocaleString();
+            sourceCell.textContent = "&nbsp;"; // Source becomes empty/0 after transfer
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
 
             // Log the copy
             logCopy(sourceLabel, targetLabel, sourceValue, targetValue);
 
             // Show success message
+<<<<<<< HEAD
             showAlert(`📋 Copied ${sourceValue.toLocaleString()} from ${sourceLabel.replace('_Vol', '')} to ${targetLabel.replace('_Vol', '')}!`, "success");
+=======
+            showAlert(`📋 Transferred ${sourceValue.toLocaleString()} from ${sourceLabel.replace('_Vol', '')} to ${targetLabel.replace('_Vol', '')}!`, "success");
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
         }
 
         function logCopy(source, target, sourceVal, targetVal) {
@@ -349,15 +521,26 @@
             
             logEntry.innerHTML = `
                 <strong>[${timestamp}]</strong> 
+<<<<<<< HEAD
                 Copy: <strong>${source.replace('_Vol', '')}</strong> (${sourceVal.toLocaleString()}) → 
                 <strong>${target.replace('_Vol', '')}</strong>
                 <br><small style="color: #95a5a6;">Before: ${target.replace('_Vol', '')} = ${targetVal.toLocaleString()}</small>
                 <br><small style="color: #2ecc71;">After: ${target.replace('_Vol', '')} = ${sourceVal.toLocaleString()}, ${source.replace('_Vol', '')} = ${sourceVal.toLocaleString()} (unchanged)</small>
+=======
+                Transfer: <strong>${source.replace('_Vol', '')}</strong> (${sourceVal.toLocaleString()}) → 
+                <strong>${target.replace('_Vol', '')}</strong>
+                <br><small style="color: #95a5a6;">Before: ${source.replace('_Vol', '')} = ${sourceVal.toLocaleString()}, ${target.replace('_Vol', '')} = ${targetVal.toLocaleString()}</small>
+                <br><small style="color: #2ecc71;">After: ${source.replace('_Vol', '')} = 0, ${target.replace('_Vol', '')} = ${sourceVal.toLocaleString()}</small>
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
             `;
 
             const container = document.getElementById('transferLogContent');
             
+<<<<<<< HEAD
             // Clear the "no copies" message if it's the first copy
+=======
+            // Clear the "no transfers" message if it's the first transfer
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
             if (container.innerHTML.includes('No copies yet')) {
                 container.innerHTML = '';
             }
@@ -399,17 +582,43 @@
 
         // TEST HELPER FUNCTIONS
         function addTestData() {
+<<<<<<< HEAD
+=======
+            // South modules S01-S10
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
             document.getElementById("S01_Vol").textContent = "1,250";
             document.getElementById("S02_Vol").textContent = "2,500";
             document.getElementById("S03_Vol").textContent = "&nbsp;"; // Empty
             document.getElementById("S04_Vol").textContent = "750";
             document.getElementById("S05_Vol").textContent = ""; // Also empty
+<<<<<<< HEAD
             
             document.getElementById("S11_Vol").textContent = "3,200";
             document.getElementById("S12_Vol").textContent = "1,800";
             document.getElementById("S13_Vol").textContent = "&nbsp;"; // Empty
             document.getElementById("S14_Vol").textContent = "950";
             document.getElementById("S15_Vol").textContent = "4,100";
+=======
+            document.getElementById("S06_Vol").textContent = "1,850";
+            document.getElementById("S07_Vol").textContent = "2,200";
+            document.getElementById("S08_Vol").textContent = "900";
+            document.getElementById("S09_Vol").textContent = "&nbsp;"; // Empty
+            document.getElementById("S10_Vol").textContent = "1,600";
+            
+            // North modules S11-S22
+            document.getElementById("S11_Vol").textContent = "3,200";
+            document.getElementById("S12_Vol").textContent = "1,800";
+            document.getElementById("S21_Vol").textContent = "2,750";
+            document.getElementById("S13_Vol").textContent = "&nbsp;"; // Empty
+            document.getElementById("S14_Vol").textContent = "950";
+            document.getElementById("S22_Vol").textContent = "3,400";
+            document.getElementById("S15_Vol").textContent = "4,100";
+            document.getElementById("S16_Vol").textContent = "1,950";
+            document.getElementById("S17_Vol").textContent = "2,650";
+            document.getElementById("S18_Vol").textContent = "1,750";
+            document.getElementById("S19_Vol").textContent = "3,050";
+            document.getElementById("S20_Vol").textContent = "2,150";
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
             
             showAlert("📊 Test data loaded successfully!", "success");
         }
@@ -417,20 +626,40 @@
         function addFormattedData() {
             document.getElementById("S01_Vol").textContent = "12,345";
             document.getElementById("S02_Vol").textContent = "67,890";
+<<<<<<< HEAD
             document.getElementById("S11_Vol").textContent = "98,765";
             document.getElementById("S12_Vol").textContent = "123,456";
+=======
+            document.getElementById("S06_Vol").textContent = "45,678";
+            document.getElementById("S10_Vol").textContent = "78,901";
+            document.getElementById("S11_Vol").textContent = "98,765";
+            document.getElementById("S12_Vol").textContent = "123,456";
+            document.getElementById("S16_Vol").textContent = "234,567";
+            document.getElementById("S20_Vol").textContent = "345,678";
+            document.getElementById("S21_Vol").textContent = "456,789";
+            document.getElementById("S22_Vol").textContent = "567,890";
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
             
             showAlert("💰 Big numbers loaded!", "success");
         }
 
         function clearAllData() {
+<<<<<<< HEAD
             const cells = ["S01_Vol", "S02_Vol", "S03_Vol", "S04_Vol", "S05_Vol", 
                           "S11_Vol", "S12_Vol", "S13_Vol", "S14_Vol", "S15_Vol"];
+=======
+            const cells = ["S01_Vol", "S02_Vol", "S03_Vol", "S04_Vol", "S05_Vol", "S06_Vol", "S07_Vol", "S08_Vol", "S09_Vol", "S10_Vol",
+                          "S11_Vol", "S12_Vol", "S13_Vol", "S14_Vol", "S15_Vol", "S16_Vol", "S17_Vol", "S18_Vol", "S19_Vol", "S20_Vol", "S21_Vol", "S22_Vol"];
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
             cells.forEach(id => {
                 document.getElementById(id).textContent = "&nbsp;";
             });
             
+<<<<<<< HEAD
             document.getElementById("transferLogContent").innerHTML = '<em>No copies yet. Click "COPY NOW" to see the magic! ✨</em>';
+=======
+            document.getElementById("transferLogContent").innerHTML = '<em>No transfers yet. Click "TRANSFER NOW" to see the magic! ✨</em>';
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
             showAlert("🗑️ All data cleared!", "info");
         }
 
@@ -439,7 +668,11 @@
             setTimeout(() => {
                 document.getElementById("sourceSelect").value = "S11_Vol";
                 document.getElementById("targetSelect").value = "S01_Vol";
+<<<<<<< HEAD
                 showAlert("🎯 Demo setup: S11 → S01. Click COPY NOW!", "info");
+=======
+                showAlert("🎯 Demo setup: S11 → S01. Click TRANSFER NOW!", "info");
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
             }, 500);
         }
 
@@ -481,7 +714,11 @@
 
         // Initialize with some test data on load
         window.onload = function() {
+<<<<<<< HEAD
             showAlert("🎉 Copy Function Test Ready! Click 'Add Test Data' to begin.", "info");
+=======
+            showAlert("🎉 Transfer Function Test Ready! Click 'Add Test Data' to begin.", "info");
+>>>>>>> 50b4e69 (Updated Enhanced Dashboard)
         };
     </script>
 </body>

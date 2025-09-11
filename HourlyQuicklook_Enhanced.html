@@ -13,6 +13,8 @@
     <!-- Chart.js for amazing visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <!-- Chart.js Gauge Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-gauge@0.3.0/dist/chartjs-gauge.min.js"></script>
     
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -308,13 +310,17 @@
         </div>
         <div class="kpi-card" onclick="focusChart('uptime')">
             <i class="fas fa-clock kpi-icon"></i>
-            <div id="avgUptime" class="kpi-value">0%</div>
+            <div class="chart-container chart-small" style="margin: 10px 0;">
+                <canvas id="uptimeGauge"></canvas>
+            </div>
             <div class="kpi-label">System Uptime</div>
         </div>
-        <div class="kpi-card" onclick="focusChart('alerts')">
+        <div class="kpi-card" onclick="focusChart('downtime')">
             <i class="fas fa-exclamation-triangle kpi-icon"></i>
-            <div id="activeAlerts" class="kpi-value">0</div>
-            <div class="kpi-label">Active Alerts</div>
+            <div class="chart-container chart-small" style="margin: 10px 0;">
+                <canvas id="downtimeGauge"></canvas>
+            </div>
+            <div class="kpi-label">System Downtime</div>
         </div>
     </div>
 
@@ -486,9 +492,11 @@
 
     <script>
         // Global variables
-        let volumeTrendChart, efficiencyChart, heatmapChart;
+        let volumeTrendChart, efficiencyChart, heatmapChart, uptimeGauge, downtimeGauge;
         let realTimeData = {};
         let alertCount = 0;
+        let currentUptime = 0;
+        let currentDowntime = 0;
 
         // Initialize dashboard
         $(document).ready(function() {
@@ -532,8 +540,21 @@
 
             document.getElementById('totalVolume').textContent = totalVol.toLocaleString();
             document.getElementById('avgEfficiency').textContent = Math.floor(85 + Math.random() * 10) + '%';
-            document.getElementById('avgUptime').textContent = Math.floor(88 + Math.random() * 10) + '%';
-            document.getElementById('activeAlerts').textContent = alertCount;
+            
+            // Update uptime and downtime values
+            currentUptime = Math.floor(88 + Math.random() * 10);
+            currentDowntime = 100 - currentUptime;
+            
+            // Update gauges
+            if (uptimeGauge) {
+                uptimeGauge.data.datasets[0].data = [currentUptime];
+                uptimeGauge.update('none');
+            }
+            
+            if (downtimeGauge) {
+                downtimeGauge.data.datasets[0].data = [currentDowntime];
+                downtimeGauge.update('none');
+            }
 
             // Add pulse animation to changed values
             document.getElementById('totalVolume').classList.add('pulse-animation');
@@ -543,6 +564,89 @@
         }
 
         function createCharts() {
+            // Create uptime gauge
+            const uptimeCtx = document.getElementById('uptimeGauge').getContext('2d');
+            uptimeGauge = new Chart(uptimeCtx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [currentUptime, 100 - currentUptime],
+                        backgroundColor: ['#27ae60', '#2c3e50'],
+                        borderWidth: 0,
+                        cutout: '75%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    },
+                    animation: { animateRotate: true, duration: 1000 }
+                },
+                plugins: [{
+                    id: 'centerText',
+                    beforeDraw: function(chart) {
+                        const ctx = chart.ctx;
+                        ctx.save();
+                        const centerX = (chart.chartArea.left + chart.chartArea.right) / 2;
+                        const centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
+                        
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillStyle = '#ecf0f1';
+                        ctx.font = 'bold 20px Arial';
+                        ctx.fillText(currentUptime + '%', centerX, centerY - 5);
+                        
+                        ctx.font = '12px Arial';
+                        ctx.fillText('Uptime', centerX, centerY + 15);
+                        ctx.restore();
+                    }
+                }]
+            });
+
+            // Create downtime gauge
+            const downtimeCtx = document.getElementById('downtimeGauge').getContext('2d');
+            downtimeGauge = new Chart(downtimeCtx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [currentDowntime, 100 - currentDowntime],
+                        backgroundColor: ['#e74c3c', '#2c3e50'],
+                        borderWidth: 0,
+                        cutout: '75%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    },
+                    animation: { animateRotate: true, duration: 1000 }
+                },
+                plugins: [{
+                    id: 'centerText',
+                    beforeDraw: function(chart) {
+                        const ctx = chart.ctx;
+                        ctx.save();
+                        const centerX = (chart.chartArea.left + chart.chartArea.right) / 2;
+                        const centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
+                        
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillStyle = '#ecf0f1';
+                        ctx.font = 'bold 20px Arial';
+                        ctx.fillText(currentDowntime + '%', centerX, centerY - 5);
+                        
+                        ctx.font = '12px Arial';
+                        ctx.fillText('Downtime', centerX, centerY + 15);
+                        ctx.restore();
+                    }
+                }]
+            });
             // Volume Trend Chart
             const ctx1 = document.getElementById('volumeTrendChart').getContext('2d');
             volumeTrendChart = new Chart(ctx1, {
@@ -905,7 +1009,8 @@
             const charts = {
                 volume: 'volumeTrendChart',
                 efficiency: 'efficiencyChart',
-                uptime: 'heatmapChart',
+                uptime: 'uptimeGauge',
+                downtime: 'downtimeGauge',
                 alerts: 'alertsContainer'
             };
             
