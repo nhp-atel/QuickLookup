@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transfer Function Test</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #333;
+        }
+
+        td, th {
+            border: 1px solid #666;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #555;
+        }
+
+        .test-section {
+            background-color: #2c3e50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 2px solid #34495e;
+        }
+
+        .test-section h3 {
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+
+        .transfer-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .transfer-group {
+            background-color: #34495e;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #4a5c6a;
+        }
+
+        .transfer-group h4 {
+            color: #3498db;
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .transfer-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .transfer-row label {
+            color: white;
+            font-size: 12px;
+            min-width: 60px;
+        }
+
+        .transfer-row select {
+            flex: 1;
+            padding: 5px;
+            border-radius: 3px;
+            border: 1px solid #555;
+            background-color: #555;
+            color: white;
+        }
+
+        .transfer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .transfer-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s;
+        }
+
+        .transfer-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .transfer-btn.primary {
+            background-color: #e74c3c;
+            font-weight: bold;
+            padding: 12px 20px;
+        }
+
+        .transfer-btn.primary:hover {
+            background-color: #c0392b;
+        }
+
+        .test-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .test-btn:hover {
+            background-color: #229954;
+        }
+
+        .test-results {
+            background-color: #1a1a1a;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .success {
+            color: #2ecc71;
+        }
+
+        .error {
+            color: #e74c3c;
+        }
+
+        .warning {
+            color: #f39c12;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Transfer Function Test Environment</h1>
+
+    <div class="test-section">
+        <h3>📊 Sample Data Tables</h3>
+
+        <!-- Test Data Table -->
+        <table>
+            <tr>
+                <th>Station</th>
+                <th>Volume</th>
+                <th>Belt Stops</th>
+                <th>Uptime %</th>
+                <th>Decline %</th>
+                <th>Chute Full</th>
+                <th>Chute Full %</th>
+            </tr>
+            <tr>
+                <td>S01</td>
+                <td id="S01_Vol" class="value">2,100</td>
+                <td id="S01_BS">12</td>
+                <td id="S01_UTPct">96.8%</td>
+                <td id="S01_DecPct">1.2%</td>
+                <td id="S01_CF">4</td>
+                <td id="S01_CFPct">2.9%</td>
+            </tr>
+            <tr>
+                <td>S02</td>
+                <td id="S02_Vol" class="value">1,750</td>
+                <td id="S02_BS">20</td>
+                <td id="S02_UTPct">91.4%</td>
+                <td id="S02_DecPct">2.8%</td>
+                <td id="S02_CF">9</td>
+                <td id="S02_CFPct">6.1%</td>
+            </tr>
+            <tr>
+                <td>S11</td>
+                <td id="S11_Vol" class="value">1,250</td>
+                <td id="S11_BS">15</td>
+                <td id="S11_UTPct">92.5%</td>
+                <td id="S11_DecPct">2.1%</td>
+                <td id="S11_CF">8</td>
+                <td id="S11_CFPct">5.3%</td>
+            </tr>
+            <tr>
+                <td>S12</td>
+                <td id="S12_Vol" class="value">980</td>
+                <td id="S12_BS">22</td>
+                <td id="S12_UTPct">88.7%</td>
+                <td id="S12_DecPct">3.2%</td>
+                <td id="S12_CF">12</td>
+                <td id="S12_CFPct">7.8%</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Transfer Controls Section -->
+    <div class="test-section">
+        <h3>🔄 Transfer Controls</h3>
+
+        <div class="transfer-controls">
+            <!-- Volume Transfer -->
+            <div class="transfer-group">
+                <h4>📦 Volume Transfer</h4>
+                <div class="transfer-row">
+                    <label>Source:</label>
+                    <select id="sourceSelectVol">
+                        <option value="S01_Vol">S01</option>
+                        <option value="S02_Vol">S02</option>
+                        <option value="S11_Vol">S11</option>
+                        <option value="S12_Vol">S12</option>
+                    </select>
+                </div>
+                <div class="transfer-row">
+                    <label>Target:</label>
+                    <select id="targetSelectVol">
+                        <option value="S01_Vol">S01</option>
+                        <option value="S02_Vol">S02</option>
+                        <option value="S11_Vol">S11</option>
+                        <option value="S12_Vol">S12</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Belt Stop Transfer -->
+            <div class="transfer-group">
+                <h4>⛔ Belt Stop Transfer</h4>
+                <div class="transfer-row">
+                    <label>Source:</label>
+                    <select id="sourceSelectBS">
+                        <option value="S01_BS">S01</option>
+                        <option value="S02_BS">S02</option>
+                        <option value="S11_BS">S11</option>
+                        <option value="S12_BS">S12</option>
+                    </select>
+                </div>
+                <div class="transfer-row">
+                    <label>Target:</label>
+                    <select id="targetSelectBS">
+                        <option value="S01_BS">S01</option>
+                        <option value="S02_BS">S02</option>
+                        <option value="S11_BS">S11</option>
+                        <option value="S12_BS">S12</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Uptime % Transfer -->
+            <div class="transfer-group">
+                <h4>⏱️ Uptime % Transfer</h4>
+                <div class="transfer-row">
+                    <label>Source:</label>
+                    <select id="sourceSelectUTPct">
+                        <option value="S01_UTPct">S01</option>
+                        <option value="S02_UTPct">S02</option>
+                        <option value="S11_UTPct">S11</option>
+                        <option value="S12_UTPct">S12</option>
+                    </select>
+                </div>
+                <div class="transfer-row">
+                    <label>Target:</label>
+                    <select id="targetSelectUTPct">
+                        <option value="S01_UTPct">S01</option>
+                        <option value="S02_UTPct">S02</option>
+                        <option value="S11_UTPct">S11</option>
+                        <option value="S12_UTPct">S12</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transfer Buttons -->
+        <div class="transfer-buttons">
+            <button class="transfer-btn" onclick="transferVolume()">Transfer Volume</button>
+            <button class="transfer-btn" onclick="transferBeltStops()">Transfer Belt Stops</button>
+            <button class="transfer-btn" onclick="transferUptime()">Transfer Uptime %</button>
+            <button class="transfer-btn primary" onclick="transferAll()">🔄 TRANSFER ALL</button>
+        </div>
+    </div>
+
+    <!-- Test Controls -->
+    <div class="test-section">
+        <h3>🧪 Test Controls</h3>
+
+        <button class="test-btn" onclick="runBasicTests()">Run Basic Tests</button>
+        <button class="test-btn" onclick="runEdgeCaseTests()">Run Edge Case Tests</button>
+        <button class="test-btn" onclick="resetTestData()">Reset Test Data</button>
+        <button class="test-btn" onclick="randomizeData()">Randomize Data</button>
+
+        <div id="testResults" class="test-results">
+            Test results will appear here...
+        </div>
+    </div>
+
+<script>
+    // Original test data for reset
+    const originalData = {
+        'S01_Vol': '2,100', 'S01_BS': '12', 'S01_UTPct': '96.8%', 'S01_DecPct': '1.2%', 'S01_CF': '4', 'S01_CFPct': '2.9%',
+        'S02_Vol': '1,750', 'S02_BS': '20', 'S02_UTPct': '91.4%', 'S02_DecPct': '2.8%', 'S02_CF': '9', 'S02_CFPct': '6.1%',
+        'S11_Vol': '1,250', 'S11_BS': '15', 'S11_UTPct': '92.5%', 'S11_DecPct': '2.1%', 'S11_CF': '8', 'S11_CFPct': '5.3%',
+        'S12_Vol': '980', 'S12_BS': '22', 'S12_UTPct': '88.7%', 'S12_DecPct': '3.2%', 'S12_CF': '12', 'S12_CFPct': '7.8%',
+    };
+
+    // Transfer functions
+    function readValue(cell, type) {
+        const txt = cell.textContent.replace(/\u00A0/g, "").trim();
+        if (txt === "" || txt === "&nbsp;") return 0;
+
+        if (type === "percent") {
+            const m = txt.match(/-?\d*\.?\d+/);
+            if (!m) return null;
+            const n = parseFloat(m[0]);
+            return Number.isNaN(n) ? null : n;
+        }
+
+        if (type === "float") {
+            const n = parseFloat(txt.replace(/,/g, ""));
+            return Number.isNaN(n) ? null : n;
+        }
+
+        const n = parseInt(txt.replace(/,/g, ""), 10);
+        return Number.isNaN(n) ? null : n;
+    }
+
+    function writeValue(cell, value, type) {
+        if (value === 0) {
+            cell.innerHTML = "&nbsp;";
+            return;
+        }
+        if (type === "percent") {
+            cell.textContent = `${value}%`;
+            return;
+        }
+        if (type === "float") {
+            cell.textContent = Number(value).toLocaleString(undefined, {
+                maximumFractionDigits: 2,
+            });
+            return;
+        }
+        cell.textContent = parseInt(value, 10).toLocaleString();
+    }
+
+    function transferPair(sourceSelectId, targetSelectId, type) {
+        const srcSel = document.getElementById(sourceSelectId);
+        const dstSel = document.getElementById(targetSelectId);
+
+        if (!srcSel || !dstSel) {
+            logResult(`❌ Missing selects: ${sourceSelectId} / ${targetSelectId}`, 'error');
+            return false;
+        }
+
+        const sourceLabel = srcSel.value;
+        const targetLabel = dstSel.value;
+
+        if (sourceLabel === targetLabel) {
+            logResult(`⚠️ Source and target must be different for ${sourceSelectId.replace('sourceSelect','')}`, 'warning');
+            return false;
+        }
+
+        const sourceCell = document.getElementById(sourceLabel);
+        const targetCell = document.getElementById(targetLabel);
+
+        if (!sourceCell || !targetCell) {
+            logResult(`❌ Could not find cells: ${sourceLabel} / ${targetLabel}`, 'error');
+            return false;
+        }
+
+        const sourceValue = readValue(sourceCell, type);
+        const targetValue = readValue(targetCell, type);
+
+        if (sourceValue === null || targetValue === null) {
+            logResult(`❌ Invalid values in ${sourceLabel} or ${targetLabel}`, 'error');
+            return false;
+        }
+
+        // Store before values for logging
+        const beforeSource = sourceCell.textContent;
+        const beforeTarget = targetCell.textContent;
+
+        // Swap values
+        writeValue(targetCell, sourceValue, type);
+        writeValue(sourceCell, targetValue, type);
+
+        logResult(`✅ Swapped ${sourceLabel} (${beforeSource}) ↔ ${targetLabel} (${beforeTarget})`, 'success');
+        return true;
+    }
+
+    function transferVolume() {
+        return transferPair("sourceSelectVol", "targetSelectVol", "int");
+    }
+
+    function transferBeltStops() {
+        return transferPair("sourceSelectBS", "targetSelectBS", "int");
+    }
+
+    function transferUptime() {
+        return transferPair("sourceSelectUTPct", "targetSelectUTPct", "percent");
+    }
+
+    function transferAll() {
+        logResult("🔄 Starting transfer all...", 'success');
+        const pairs = [
+            ["sourceSelectVol", "targetSelectVol", "int"],
+            ["sourceSelectBS", "targetSelectBS", "int"],
+            ["sourceSelectUTPct", "targetSelectUTPct", "percent"]
+        ];
+
+        let successCount = 0;
+        for (const [s, t, type] of pairs) {
+            if (transferPair(s, t, type)) {
+                successCount++;
+            }
+        }
+
+        logResult(`📊 Transfer complete: ${successCount}/${pairs.length} successful`, 'success');
+        return successCount === pairs.length;
+    }
+
+    function resetTestData() {
+        for (const [id, value] of Object.entries(originalData)) {
+            const cell = document.getElementById(id);
+            if (cell) {
+                cell.textContent = value;
+            }
+        }
+        logResult("🔄 Test data reset to original values", 'success');
+    }
+
+    function randomizeData() {
+        const stations = ['S01', 'S02', 'S11', 'S12'];
+
+        stations.forEach(station => {
+            document.getElementById(`${station}_Vol`).textContent = (Math.floor(Math.random() * 2000) + 500).toLocaleString();
+            document.getElementById(`${station}_BS`).textContent = Math.floor(Math.random() * 30) + 5;
+            document.getElementById(`${station}_UTPct`).textContent = (Math.random() * 15 + 85).toFixed(1) + '%';
+        });
+
+        logResult("🎲 Data randomized", 'success');
+    }
+
+    function runBasicTests() {
+        logResult("🧪 Running basic tests...", 'success');
+
+        // Test 1: Volume transfer
+        document.getElementById('sourceSelectVol').value = 'S01_Vol';
+        document.getElementById('targetSelectVol').value = 'S11_Vol';
+        transferVolume();
+
+        // Test 2: Belt stops transfer
+        document.getElementById('sourceSelectBS').value = 'S02_BS';
+        document.getElementById('targetSelectBS').value = 'S12_BS';
+        transferBeltStops();
+
+        logResult("✅ Basic tests completed", 'success');
+    }
+
+    function runEdgeCaseTests() {
+        logResult("🧪 Running edge case tests...", 'success');
+
+        // Test same source/target
+        document.getElementById('sourceSelectVol').value = 'S01_Vol';
+        document.getElementById('targetSelectVol').value = 'S01_Vol';
+        transferVolume();
+
+        logResult("✅ Edge case tests completed", 'success');
+    }
+
+    function logResult(message, type = 'success') {
+        const results = document.getElementById('testResults');
+        const timestamp = new Date().toLocaleTimeString();
+        const className = type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'success';
+
+        results.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+        results.scrollTop = results.scrollHeight;
+    }
+
+    // Initialize
+    logResult("🚀 Test environment loaded. Ready for testing!", 'success');
+</script>
+
+</body>
+</html>
