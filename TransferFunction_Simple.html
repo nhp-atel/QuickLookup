@@ -810,94 +810,79 @@
         </div>
 
     <div class="controls">
-        <h3 style="color: white; margin-bottom: 20px;">🔄 Complete Module Data Transfer</h3>
-        <p style="color: #ccc; margin-bottom: 20px; text-align: center;">Transfers ALL data (Volume, Uptime %, Chutefulls, Belt Stops, Decline %) from source to target module</p>
-        
-        <div style="margin-bottom: 15px;">
-            <label for="sourceSelect" style="color: #fff; font-weight: bold;">Source Module:</label>
-            <select id="sourceSelect" style="padding: 8px 12px; margin: 0 10px;">
-                <option value="S01">S01 (South)</option>
-                <option value="S02">S02 (South)</option>
-                <option value="S03">S03 (South)</option>
-                <option value="S04">S04 (South)</option>
-                <option value="S05">S05 (South)</option>
-                <option value="S06">S06 (South)</option>
-                <option value="S07">S07 (South)</option>
-                <option value="S08">S08 (South)</option>
-                <option value="S09">S09 (South)</option>
-                <option value="S10">S10 (South)</option>
-                <option value="S11">S11 (North)</option>
-                <option value="S12">S12 (North)</option>
-                <option value="S13">S13 (North)</option>
-                <option value="S14">S14 (North)</option>
-                <option value="S15">S15 (North)</option>
-                <option value="S16">S16 (North)</option>
-                <option value="S17">S17 (North)</option>
-                <option value="S18">S18 (North)</option>
-                <option value="S19">S19 (North)</option>
-                <option value="S20">S20 (North)</option>
-                <option value="S21">S21 (North)</option>
-                <option value="S22">S22 (North)</option>
+        <h3 style="color: white;">Transfer Station Data</h3>
+
+        <div>
+            <label for="sourceSelect" style="color: white;">Source:</label>
+            <select id="sourceSelect">
+                <option value="S01">S01</option>
+                <option value="S02">S02</option>
+                <option value="S03">S03</option>
+                <option value="S04">S04</option>
+                <option value="S05">S05</option>
+                <option value="S06">S06</option>
+                <option value="S07">S07</option>
+                <option value="S08">S08</option>
+                <option value="S09">S09</option>
+                <option value="S10">S10</option>
+                <option value="S11">S11</option>
+                <option value="S12">S12</option>
+                <option value="S13">S13</option>
+                <option value="S14">S14</option>
+                <option value="S15">S15</option>
+                <option value="S16">S16</option>
+                <option value="S17">S17</option>
+                <option value="S18">S18</option>
+                <option value="S19">S19</option>
+                <option value="S20">S20</option>
+                <option value="S21">S21</option>
+                <option value="S22">S22</option>
             </select>
-        </div>
-        
-        <div style="margin-bottom: 15px;">
-            <label for="targetSelect" style="color: #fff; font-weight: bold;">Target Module:</label>
-            <select id="targetSelect" style="padding: 8px 12px; margin: 0 10px;">
-                <option value="S01">S01 (South)</option>
-                <option value="S02">S02 (South)</option>
-                <option value="S03">S03 (South)</option>
-                <option value="S04">S04 (South)</option>
-                <option value="S05">S05 (South)</option>
-                <option value="S06">S06 (South)</option>
-                <option value="S07">S07 (South)</option>
-                <option value="S08">S08 (South)</option>
-                <option value="S09">S09 (South)</option>
-                <option value="S10">S10 (South)</option>
-                <option value="S11">S11 (North)</option>
-                <option value="S12">S12 (North)</option>
-                <option value="S13">S13 (North)</option>
-                <option value="S14">S14 (North)</option>
-                <option value="S15">S15 (North)</option>
-                <option value="S16">S16 (North)</option>
-                <option value="S17">S17 (North)</option>
-                <option value="S18">S18 (North)</option>
-                <option value="S19">S19 (North)</option>
-                <option value="S20">S20 (North)</option>
-                <option value="S21">S21 (North)</option>
-                <option value="S22">S22 (North)</option>
+
+            <label for="targetSelect" style="color: white;">Target:</label>
+            <select id="targetSelect">
+                <option value="S01">S01</option>
+                <option value="S02">S02</option>
+                <option value="S03">S03</option>
+                <option value="S04">S04</option>
+                <option value="S05">S05</option>
+                <option value="S06">S06</option>
+                <option value="S07">S07</option>
+                <option value="S08">S08</option>
+                <option value="S09">S09</option>
+                <option value="S10">S10</option>
+                <option value="S11">S11</option>
+                <option value="S12">S12</option>
+                <option value="S13">S13</option>
+                <option value="S14">S14</option>
+                <option value="S15">S15</option>
+                <option value="S16">S16</option>
+                <option value="S17">S17</option>
+                <option value="S18">S18</option>
+                <option value="S19">S19</option>
+                <option value="S20">S20</option>
+                <option value="S21">S21</option>
+                <option value="S22">S22</option>
             </select>
         </div>
 
-        <div style="margin-top: 20px;">
-            <button onclick="transferAllData()" style="background: #e74c3c; padding: 12px 25px; font-size: 1.1em;">📤 TRANSFER ALL DATA</button>
-            <button onclick="swapAllData()" style="background: #27ae60; padding: 12px 25px; font-size: 1.1em; margin-left: 10px;">🔄 SWAP ALL DATA</button>
-        </div>
-    </div>
-
-    <div class="results">
-        <h3 style="color: white;">Transfer Results</h3>
-        <div id="testResults">
-            <p style="color: white;"><em>No transfers yet. Select source and target, then click Transfer.</em></p>
+        <div>
+            <button onclick="transferAllData()">Transfer All Data</button>
         </div>
     </div>
 
     <script>
-        // TRANSFER ALL DATA FROM SOURCE TO TARGET MODULE
         function transferAllData() {
             const sourceModule = document.getElementById("sourceSelect").value;
             const targetModule = document.getElementById("targetSelect").value;
 
             if (sourceModule === targetModule) {
-                alert("❌ Source and target modules must be different!");
+                alert("Source and target must be different!");
                 return;
             }
 
             const dataTypes = ["Vol", "UTPct", "CF", "CFPct", "BS", "DecPct"];
-            const transferResults = [];
-            let transferCount = 0;
 
-            // Process each data type
             dataTypes.forEach(dataType => {
                 const sourceId = sourceModule + "_" + dataType;
                 const targetId = targetModule + "_" + dataType;
@@ -906,288 +891,14 @@
                 const targetCell = document.getElementById(targetId);
 
                 if (sourceCell && targetCell) {
-                    const sourceText = sourceCell.textContent.trim();
-                    const targetText = targetCell.textContent.trim();
+                    const sourceValue = sourceCell.textContent;
+                    const targetValue = targetCell.textContent;
 
-                    let sourceValue, displayValue;
-                    
-                    // Handle percentage data types
-                    if (dataType.includes('Pct')) {
-                        sourceValue = (sourceText === "" || sourceText === "\u00A0" || sourceText === "&nbsp;") ? "0%" : sourceText;
-                        displayValue = sourceValue;
-                        
-                        // Transfer: target gets source value, source becomes 0%
-                        targetCell.textContent = sourceValue;
-                        sourceCell.textContent = "0%";
-                    } else {
-                        // Handle numeric data (volume, chutefulls, belt stops)
-                        const sourceNum = (sourceText === "" || sourceText === "\u00A0" || sourceText === "&nbsp;") ? 0 : parseInt(sourceText.replace(/,|%/g, ''));
-                        sourceValue = sourceNum;
-                        displayValue = sourceNum === 0 ? "0" : sourceNum.toLocaleString();
-                        
-                        // Transfer: target gets source value, source becomes empty
-                        targetCell.textContent = sourceValue === 0 ? "&nbsp;" : sourceValue.toLocaleString();
-                        sourceCell.textContent = "&nbsp;";
-                    }
-                    
-                    // Track successful transfers
-                    if (sourceValue !== 0 && sourceValue !== "0%") {
-                        transferResults.push(`${getDataTypeName(dataType)}: ${displayValue}`);
-                        transferCount++;
-                    }
+                    // Swap values
+                    targetCell.textContent = sourceValue;
+                    sourceCell.textContent = targetValue;
                 }
             });
-
-            // Log the complete transfer
-            logCompleteTransfer(sourceModule, targetModule, transferResults, 'transfer');
-            
-            if (transferCount > 0) {
-                alert(`✅ Transferred ${transferCount} data fields from ${sourceModule} to ${targetModule}!`);
-            } else {
-                alert(`ℹ️ No data to transfer from ${sourceModule} (all fields were empty or zero).`);
-            }
-        }
-        
-        // SWAP ALL DATA BETWEEN TWO MODULES
-        function swapAllData() {
-            const sourceModule = document.getElementById("sourceSelect").value;
-            const targetModule = document.getElementById("targetSelect").value;
-
-            if (sourceModule === targetModule) {
-                alert("❌ Source and target modules must be different!");
-                return;
-            }
-
-            const dataTypes = ["Vol", "UTPct", "CF", "CFPct", "BS", "DecPct"];
-            const swapResults = [];
-            let swapCount = 0;
-
-            // Process each data type
-            dataTypes.forEach(dataType => {
-                const sourceId = sourceModule + "_" + dataType;
-                const targetId = targetModule + "_" + dataType;
-
-                const sourceCell = document.getElementById(sourceId);
-                const targetCell = document.getElementById(targetId);
-
-                if (sourceCell && targetCell) {
-                    const sourceText = sourceCell.textContent.trim();
-                    const targetText = targetCell.textContent.trim();
-
-                    let sourceValue, targetValue, sourceDisplay, targetDisplay;
-                    
-                    // Handle percentage data types
-                    if (dataType.includes('Pct')) {
-                        sourceValue = (sourceText === "" || sourceText === "\u00A0" || sourceText === "&nbsp;") ? "0%" : sourceText;
-                        targetValue = (targetText === "" || targetText === "\u00A0" || targetText === "&nbsp;") ? "0%" : targetText;
-                        sourceDisplay = sourceValue;
-                        targetDisplay = targetValue;
-                        
-                        // Swap the values
-                        targetCell.textContent = sourceValue;
-                        sourceCell.textContent = targetValue;
-                    } else {
-                        // Handle numeric data
-                        const sourceNum = (sourceText === "" || sourceText === "\u00A0" || sourceText === "&nbsp;") ? 0 : parseInt(sourceText.replace(/,|%/g, ''));
-                        const targetNum = (targetText === "" || targetText === "\u00A0" || targetText === "&nbsp;") ? 0 : parseInt(targetText.replace(/,|%/g, ''));
-                        
-                        sourceValue = sourceNum;
-                        targetValue = targetNum;
-                        sourceDisplay = sourceNum === 0 ? "0" : sourceNum.toLocaleString();
-                        targetDisplay = targetNum === 0 ? "0" : targetNum.toLocaleString();
-                        
-                        // Swap the values
-                        targetCell.textContent = sourceValue === 0 ? "&nbsp;" : sourceValue.toLocaleString();
-                        sourceCell.textContent = targetValue === 0 ? "&nbsp;" : targetValue.toLocaleString();
-                    }
-                    
-                    // Track swaps (only if there's actual data to swap)
-                    if (sourceValue !== 0 && sourceValue !== "0%" || targetValue !== 0 && targetValue !== "0%") {
-                        swapResults.push(`${getDataTypeName(dataType)}: ${sourceDisplay} ↔ ${targetDisplay}`);
-                        swapCount++;
-                    }
-                }
-            });
-
-            // Log the complete swap
-            logCompleteTransfer(sourceModule, targetModule, swapResults, 'swap');
-            
-            if (swapCount > 0) {
-                alert(`✅ Swapped ${swapCount} data fields between ${sourceModule} and ${targetModule}!`);
-            } else {
-                alert(`ℹ️ No data to swap between ${sourceModule} and ${targetModule} (all fields were empty or zero).`);
-            }
-        }
-        
-        // Helper function to get readable data type names
-        function getDataTypeName(dataType) {
-            const names = {
-                "Vol": "Volume",
-                "UTPct": "Uptime %",
-                "CF": "Chutefulls",
-                "CFPct": "Chutefull %",
-                "BS": "Belt Stops",
-                "DecPct": "Decline %"
-            };
-            return names[dataType] || dataType;
-        }
-
-        // TEST HELPER FUNCTIONS
-        function addTestData() {
-            // Add Volume data
-            const volumeData = {
-                "S01_Vol": "1,250", "S02_Vol": "2,500", "S03_Vol": "&nbsp;", "S04_Vol": "750", "S05_Vol": "",
-                "S06_Vol": "1,850", "S07_Vol": "2,200", "S08_Vol": "900", "S09_Vol": "&nbsp;", "S10_Vol": "1,600",
-                "S11_Vol": "3,200", "S12_Vol": "1,800", "S21_Vol": "2,750", "S13_Vol": "&nbsp;", "S14_Vol": "950",
-                "S22_Vol": "3,400", "S15_Vol": "4,100", "S16_Vol": "1,950", "S17_Vol": "2,650", "S18_Vol": "1,750",
-                "S19_Vol": "3,050", "S20_Vol": "2,150"
-            };
-            
-            // Add Uptime % data
-            const uptimeData = {
-                "S01_UTPct": "95.2%", "S02_UTPct": "87.5%", "S03_UTPct": "92.1%", "S04_UTPct": "89.7%", "S05_UTPct": "96.3%",
-                "S06_UTPct": "91.8%", "S07_UTPct": "88.4%", "S08_UTPct": "93.6%", "S09_UTPct": "85.9%", "S10_UTPct": "94.2%",
-                "S11_UTPct": "97.1%", "S12_UTPct": "89.3%", "S21_UTPct": "92.7%", "S13_UTPct": "86.5%", "S14_UTPct": "95.8%",
-                "S22_UTPct": "90.4%", "S15_UTPct": "93.9%", "S16_UTPct": "87.6%", "S17_UTPct": "91.2%", "S18_UTPct": "94.7%",
-                "S19_UTPct": "88.1%", "S20_UTPct": "96.5%"
-            };
-            
-            // Add Chutefulls data
-            const chutefulls = {
-                "S01_CF": "12", "S02_CF": "8", "S03_CF": "15", "S04_CF": "6", "S05_CF": "9",
-                "S06_CF": "11", "S07_CF": "7", "S08_CF": "13", "S09_CF": "10", "S10_CF": "14",
-                "S11_CF": "18", "S12_CF": "5", "S21_CF": "16", "S13_CF": "9", "S14_CF": "12",
-                "S22_CF": "20", "S15_CF": "17", "S16_CF": "8", "S17_CF": "11", "S18_CF": "13",
-                "S19_CF": "15", "S20_CF": "7"
-            };
-            
-            // Add Belt Stops data
-            const beltStops = {
-                "S01_BS": "3", "S02_BS": "5", "S03_BS": "2", "S04_BS": "4", "S05_BS": "1",
-                "S06_BS": "6", "S07_BS": "8", "S08_BS": "2", "S09_BS": "7", "S10_BS": "3",
-                "S11_BS": "4", "S12_BS": "9", "S21_BS": "2", "S13_BS": "6", "S14_BS": "1",
-                "S22_BS": "5", "S15_BS": "3", "S16_BS": "8", "S17_BS": "4", "S18_BS": "2",
-                "S19_BS": "7", "S20_BS": "1"
-            };
-            
-            // Add Decline % data
-            const declineData = {
-                "S01_DecPct": "2.1%", "S02_DecPct": "3.4%", "S03_DecPct": "1.8%", "S04_DecPct": "2.9%", "S05_DecPct": "1.5%",
-                "S06_DecPct": "3.7%", "S07_DecPct": "4.2%", "S08_DecPct": "2.3%", "S09_DecPct": "3.1%", "S10_DecPct": "1.9%",
-                "S11_DecPct": "2.6%", "S12_DecPct": "4.1%", "S21_DecPct": "1.7%", "S13_DecPct": "3.8%", "S14_DecPct": "2.2%",
-                "S22_DecPct": "3.3%", "S15_DecPct": "1.4%", "S16_DecPct": "4.5%", "S17_DecPct": "2.8%", "S18_DecPct": "2.0%",
-                "S19_DecPct": "3.6%", "S20_DecPct": "1.6%"
-            };
-            
-            // Apply all test data
-            Object.entries(volumeData).forEach(([id, value]) => {
-                const element = document.getElementById(id);
-                if (element) element.textContent = value;
-            });
-            
-            Object.entries(uptimeData).forEach(([id, value]) => {
-                const element = document.getElementById(id);
-                if (element) element.textContent = value;
-            });
-            
-            Object.entries(chutefulls).forEach(([id, value]) => {
-                const element = document.getElementById(id);
-                if (element) element.textContent = value;
-            });
-            
-            Object.entries(beltStops).forEach(([id, value]) => {
-                const element = document.getElementById(id);
-                if (element) element.textContent = value;
-            });
-            
-            Object.entries(declineData).forEach(([id, value]) => {
-                const element = document.getElementById(id);
-                if (element) element.textContent = value;
-            });
-            
-            alert("✅ Multi-data test data loaded successfully!");
-        }
-
-        function addBigNumbers() {
-            document.getElementById("S01_Vol").textContent = "12,345";
-            document.getElementById("S02_Vol").textContent = "67,890";
-            document.getElementById("S06_Vol").textContent = "45,678";
-            document.getElementById("S11_Vol").textContent = "98,765";
-            document.getElementById("S12_Vol").textContent = "123,456";
-            document.getElementById("S16_Vol").textContent = "234,567";
-        }
-
-        function clearAllData() {
-            const modules = ["S01", "S02", "S03", "S04", "S05", "S06", "S07", "S08", "S09", "S10",
-                           "S11", "S12", "S13", "S14", "S15", "S16", "S17", "S18", "S19", "S20", "S21", "S22"];
-            const dataTypes = ["Vol", "UTPct", "CF", "CFPct", "BS", "DecPct"];
-            
-            modules.forEach(module => {
-                dataTypes.forEach(dataType => {
-                    const element = document.getElementById(module + "_" + dataType);
-                    if (element) {
-                        element.textContent = "&nbsp;";
-                    }
-                });
-            });
-            
-            document.getElementById("testResults").innerHTML = '<p style="color: white;"><em>No transfers yet. Select source and target modules, then click Transfer All Data or Swap All Data.</em></p>';
-            alert("🗑️ All data cleared!");
-        }
-
-        function logCompleteTransfer(sourceModule, targetModule, results, operation) {
-            const resultDiv = document.getElementById("testResults");
-            const timestamp = new Date().toLocaleTimeString();
-            
-            // Clear the "no transfers" message if it's the first transfer
-            if (resultDiv.innerHTML.includes('No transfers yet')) {
-                resultDiv.innerHTML = '';
-            }
-            
-            const transferEntry = document.createElement('div');
-            transferEntry.style.color = 'white';
-            transferEntry.style.margin = '10px 0';
-            transferEntry.style.padding = '15px';
-            transferEntry.style.background = 'rgba(0, 0, 0, 0.4)';
-            transferEntry.style.borderRadius = '8px';
-            transferEntry.style.borderLeft = operation === 'swap' ? '4px solid #27ae60' : '4px solid #e74c3c';
-            transferEntry.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
-            
-            if (operation === 'swap') {
-                transferEntry.innerHTML = `
-                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                        <strong style="font-size: 1.1em;">[${timestamp}] 🔄 COMPLETE MODULE SWAP</strong>
-                    </div>
-                    <div style="font-size: 1em; margin-bottom: 8px;">
-                        <strong>${sourceModule} ↔ ${targetModule}</strong>
-                    </div>
-                    <div style="color: #95a5a6; font-size: 0.9em;">
-                        ${results.length > 0 ? results.join('<br>') : 'No data to swap (all fields empty)'}
-                    </div>
-                `;
-            } else {
-                transferEntry.innerHTML = `
-                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                        <strong style="font-size: 1.1em;">[${timestamp}] 📤 COMPLETE MODULE TRANSFER</strong>
-                    </div>
-                    <div style="font-size: 1em; margin-bottom: 8px;">
-                        <strong>${sourceModule} → ${targetModule}</strong>
-                    </div>
-                    <div style="color: #95a5a6; font-size: 0.9em;">
-                        ${results.length > 0 ? results.join('<br>') : 'No data to transfer (all fields empty)'}
-                    </div>
-                    <div style="color: #f39c12; font-size: 0.85em; margin-top: 5px;">
-                        Source module ${sourceModule} cleared
-                    </div>
-                `;
-            }
-            
-            resultDiv.insertBefore(transferEntry, resultDiv.firstChild);
-            
-            // Keep only last 8 entries (since they're larger now)
-            while (resultDiv.children.length > 8) {
-                resultDiv.removeChild(resultDiv.lastChild);
-            }
         }
     </script>
 </body>
