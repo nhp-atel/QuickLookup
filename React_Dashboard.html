@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Building Hourly Quicklook Dashboard</title>
+
+    <!-- React and Babel for JSX transpilation -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Chart.js for potential future charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background: #0f172a;
+            color: #e2e8f0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* Custom animations */
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.8), 0 0 60px rgba(59, 130, 246, 0.6); }
+        }
+
+        .shimmer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .glow-animation {
+            animation: glow 2s infinite;
+        }
+
+        .station-highlight {
+            background: rgba(59, 130, 246, 0.2) !important;
+            border: 2px solid #3b82f6 !important;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+            transform: scale(1.02);
+            transition: all 0.3s ease;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback, useMemo } = React;
+
+        // ==========================================
+        // TYPE DEFINITIONS & CONSTANTS
+        // ==========================================
+
+        const METRICS = [
+            { key: "Vol", label: "Volume", type: "int", mode: "add" },
+            { key: "BS", label: "Belt Stops", type: "int", mode: "add" },
+            { key: "CF", label: "Chutefulls", type: "int", mode: "add" },
+            { key: "UTPct", label: "Uptime %", type: "percent", mode: "copy" },
+            { key: "DecPct", label: "Decline %", type: "percent", mode: "copy" },
+            { key: "CFPct", label: "Chutefull %", type: "percent", mode: "copy" },
+        ];
+
+        const STATION_OPTIONS = [
+            ...Array.from({length: 10}, (_, i) => ({
+                value: `S${String(i + 1).padStart(2, '0')}`,
+                label: `S${i + 1} (South)`
+            })),
+            ...Array.from({length: 12}, (_, i) => ({
+                value: `S${String(i + 11).padStart(2, '0')}`,
+                label: `S${i + 11} (North)`
+            }))
+        ];
+
+        // ==========================================
+        // UTILITY FUNCTIONS
+        // ==========================================
+
+        const formatValue = (value, type) => {
+            if (value === 0 || value === null || value === undefined) return "";
+            if (type === "percent") return `${value}%`;
+            if (type === "int") return value.toLocaleString();
+            return value;
+        };
+
+        const parseValue = (text, type) => {
+            if (!text || text === "" || text === " ") return 0;
+            if (type === "percent") {
+                const match = text.match(/-?\d*\.?\d+/);
+                return match ? parseFloat(match[0]) : 0;
+            }
+            const num = parseInt(text.replace(/,/g, ""), 10);
+            return isNaN(num) ? 0 : num;
+        };
+
+        const generateSampleData = () => {
+            const data = {};
+            STATION_OPTIONS.forEach(station => {
+                data[station.value] = {
+                    Vol: Math.floor(Math.random() * 3000) + 500,
+                    BS: Math.floor(Math.random() * 25) + 1,
+                    CF: Math.floor(Math.random() * 20) + 5,
+                    UTPct: Math.round((Math.random() * 15 + 85) * 10) / 10,
+                    DecPct: Math.round((Math.random() * 4 + 1) * 10) / 10,
+                    CFPct: Math.round((Math.random() * 8 + 2) * 10) / 10,
+                };
+            });
+            return data;
+        };
+
+        // ==========================================
+        // STATION CELL COMPONENT
+        // ==========================================
+
+        const StationCell = ({ stationId, metric, value, isHighlighted }) => {
+            const formattedValue = formatValue(value, metric.type);
+
+            return (
+                <td className={`
+                    px-3 py-2 text-center border border-gray-600 transition-all duration-300
+                    ${isHighlighted ? 'station-highlight' : 'bg-slate-700 hover:bg-slate-600'}
+                    ${!formattedValue ? 'text-gray-500' : 'text-white'}
+                `}>
+                    {formattedValue || "—"}
+                </td>
+            );
+        };
+
+        // ==========================================
+        // STATION ROW COMPONENT
+        // ==========================================
+
+        const StationRow = ({ stationId, data, label, isHighlighted, metrics }) => {
+            return (
+                <tr className={`transition-all duration-300 ${isHighlighted ? 'bg-blue-900/30' : 'hover:bg-slate-800'}`}>
+                    <td className="px-4 py-3 font-semibold text-blue-300 border border-gray-600 bg-slate-800">
+                        {label}
+                    </td>
+                    {metrics.map(metric => (
+                        <StationCell
+                            key={`${stationId}-${metric.key}`}
+                            stationId={stationId}
+                            metric={metric}
+                            value={data[metric.key] || 0}
+                            isHighlighted={isHighlighted}
+                        />
+                    ))}
+                </tr>
+            );
+        };
+
+        // ==========================================
+        // STATIONS TABLE COMPONENT
+        // ==========================================
+
+        const StationsTable = ({ title, stations, data, highlightedStations, className = "" }) => {
+            return (
+                <div className={`bg-slate-800 rounded-xl shadow-2xl overflow-hidden ${className}`}>
+                    <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4">
+                        <h3 className="text-xl font-bold text-white">{title}</h3>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
+                            <thead>
+                                <tr className="bg-slate-700">
+                                    <th className="px-4 py-3 text-left font-semibold text-blue-300 border border-gray-600">
+                                        Station
+                                    </th>
+                                    {METRICS.map(metric => (
+                                        <th key={metric.key} className="px-3 py-3 text-center font-semibold text-blue-300 border border-gray-600 min-w-[100px]">
+                                            {metric.label}
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {stations.map(station => (
+                                    <StationRow
+                                        key={station.value}
+                                        stationId={station.value}
+                                        data={data[station.value] || {}}
+                                        label={station.label}
+                                        isHighlighted={highlightedStations.includes(station.value)}
+                                        metrics={METRICS}
+                                    />
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+
+        // ==========================================
+        // TRANSFER CONTROLS COMPONENT
+        // ==========================================
+
+        const TransferControls = ({
+            sourceStation,
+            setSourceStation,
+            targetStation,
+            setTargetStation,
+            onTransfer,
+            isTransferring
+        }) => {
+            const isValidTransfer = sourceStation && targetStation && sourceStation !== targetStation;
+
+            return (
+                <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl p-8 border border-slate-700 relative overflow-hidden">
+                    {/* Background animation */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 shimmer"></div>
+
+                    <div className="relative z-10">
+                        <h2 className="text-3xl font-bold text-center text-white mb-6 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            🚀 Station Data Transfer
+                        </h2>
+
+                        <div className="flex flex-wrap items-center justify-center gap-6">
+                            {/* Source Selection */}
+                            <div className="flex flex-col items-center space-y-2">
+                                <label className="text-blue-300 font-semibold text-lg">Source Station</label>
+                                <select
+                                    value={sourceStation}
+                                    onChange={(e) => setSourceStation(e.target.value)}
+                                    className="px-4 py-3 rounded-lg border border-blue-500 bg-slate-700 text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 min-w-[150px]"
+                                    disabled={isTransferring}
+                                >
+                                    <option value="">Select Source</option>
+                                    {STATION_OPTIONS.map(option => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Arrow */}
+                            <div className="text-4xl text-blue-400 animate-pulse">
+                                →
+                            </div>
+
+                            {/* Target Selection */}
+                            <div className="flex flex-col items-center space-y-2">
+                                <label className="text-blue-300 font-semibold text-lg">Target Station</label>
+                                <select
+                                    value={targetStation}
+                                    onChange={(e) => setTargetStation(e.target.value)}
+                                    className="px-4 py-3 rounded-lg border border-blue-500 bg-slate-700 text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 min-w-[150px]"
+                                    disabled={isTransferring}
+                                >
+                                    <option value="">Select Target</option>
+                                    {STATION_OPTIONS.map(option => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Transfer Button */}
+                            <button
+                                onClick={onTransfer}
+                                disabled={!isValidTransfer || isTransferring}
+                                className={`
+                                    px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 transform
+                                    ${isValidTransfer && !isTransferring
+                                        ? 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white hover:scale-105 shadow-lg hover:shadow-xl glow-animation'
+                                        : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                    }
+                                    ${isTransferring ? 'animate-pulse' : ''}
+                                `}
+                            >
+                                {isTransferring ? '⏳ Transferring...' : '🔄 TRANSFER & ZERO SOURCE'}
+                            </button>
+                        </div>
+
+                        {/* Transfer Status */}
+                        {sourceStation && targetStation && (
+                            <div className="mt-6 text-center">
+                                {sourceStation === targetStation ? (
+                                    <p className="text-red-400 font-medium">⚠️ Source and target must be different</p>
+                                ) : (
+                                    <p className="text-green-400 font-medium">
+                                        ✅ Ready to transfer from <span className="font-bold">{sourceStation}</span> to <span className="font-bold">{targetStation}</span>
+                                    </p>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // ==========================================
+        // TRANSFER STATUS MODAL
+        // ==========================================
+
+        const TransferStatusModal = ({ isVisible, message, type = 'success' }) => {
+            if (!isVisible) return null;
+
+            const bgColor = type === 'success' ? 'from-green-500 to-emerald-500' :
+                           type === 'error' ? 'from-red-500 to-pink-500' : 'from-blue-500 to-purple-500';
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 fade-in">
+                    <div className={`bg-gradient-to-r ${bgColor} p-8 rounded-2xl shadow-2xl text-white text-center max-w-md mx-4`}>
+                        <div className="text-6xl mb-4">
+                            {type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}
+                        </div>
+                        <p className="text-xl font-bold">{message}</p>
+                    </div>
+                </div>
+            );
+        };
+
+        // ==========================================
+        // HOURLY DATA TABLE COMPONENT
+        // ==========================================
+
+        const HourlyDataTable = () => {
+            const hours = ['0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0', '5.5', '6.0', 'Final'];
+            const hourlyMetrics = [
+                'TIME STAMP', 'BUILDING VOL', 'PRIMARY VOL', 'EXCEPTION VOL',
+                'OUTBOUND VOL', 'SMALLS VOL', 'SMALLS %', 'OB CHUTE FULL',
+                'BELT STOPS', 'DEFECTS %', 'PRI NO READ %'
+            ];
+
+            return (
+                <div className="bg-slate-800 rounded-xl shadow-2xl overflow-hidden mb-8">
+                    <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4">
+                        <h2 className="text-2xl font-bold text-white">📊 Building Hourly Quicklook</h2>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
+                            <thead>
+                                <tr className="bg-slate-700">
+                                    <th className="px-4 py-3 text-left font-semibold text-blue-300 border border-gray-600">
+                                        Start Time +
+                                    </th>
+                                    {hours.map(hour => (
+                                        <th key={hour} className="px-3 py-3 text-center font-semibold text-blue-300 border border-gray-600 min-w-[80px]">
+                                            {hour} Hour
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {hourlyMetrics.map((metric, index) => (
+                                    <tr key={metric} className="hover:bg-slate-700 transition-colors duration-200">
+                                        <td className="px-4 py-3 font-semibold text-blue-300 border border-gray-600 bg-slate-800">
+                                            {metric}
+                                        </td>
+                                        {hours.map(hour => (
+                                            <td key={`${metric}-${hour}`} className="px-3 py-2 text-center border border-gray-600 bg-slate-750">
+                                                —
+                                            </td>
+                                        ))}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+        };
+
+        // ==========================================
+        // MAIN DASHBOARD COMPONENT
+        // ==========================================
+
+        const Dashboard = () => {
+            const [stationData, setStationData] = useState({});
+            const [sourceStation, setSourceStation] = useState('');
+            const [targetStation, setTargetStation] = useState('');
+            const [highlightedStations, setHighlightedStations] = useState([]);
+            const [isTransferring, setIsTransferring] = useState(false);
+            const [transferStatus, setTransferStatus] = useState({ visible: false, message: '', type: 'success' });
+            const [currentTime, setCurrentTime] = useState(new Date());
+
+            // Initialize sample data
+            useEffect(() => {
+                setStationData(generateSampleData());
+            }, []);
+
+            // Update current time
+            useEffect(() => {
+                const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+                return () => clearInterval(timer);
+            }, []);
+
+            // Simulate real-time data updates
+            useEffect(() => {
+                const interval = setInterval(() => {
+                    setStationData(prev => {
+                        const updated = { ...prev };
+                        // Randomly update a few stations
+                        const stationsToUpdate = STATION_OPTIONS.slice(0, 3);
+                        stationsToUpdate.forEach(station => {
+                            if (updated[station.value]) {
+                                updated[station.value] = {
+                                    ...updated[station.value],
+                                    Vol: Math.max(0, updated[station.value].Vol + Math.floor(Math.random() * 200 - 100)),
+                                    UTPct: Math.max(75, Math.min(100, updated[station.value].UTPct + Math.random() * 4 - 2))
+                                };
+                            }
+                        });
+                        return updated;
+                    });
+                }, 30000); // Update every 30 seconds
+
+                return () => clearInterval(interval);
+            }, []);
+
+            // Enhanced transfer function
+            const handleTransfer = useCallback(async () => {
+                if (!sourceStation || !targetStation || sourceStation === targetStation || isTransferring) {
+                    return;
+                }
+
+                setIsTransferring(true);
+                setHighlightedStations([sourceStation, targetStation]);
+
+                // Show transfer animation
+                setTransferStatus({
+                    visible: true,
+                    message: `Transferring data from ${sourceStation} to ${targetStation}...`,
+                    type: 'info'
+                });
+
+                // Simulate async operation
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Perform the transfer
+                setStationData(prev => {
+                    const updated = { ...prev };
+                    const sourceData = updated[sourceStation] || {};
+                    const targetData = updated[targetStation] || {};
+
+                    // Transfer logic based on metric mode
+                    const newTargetData = { ...targetData };
+                    const newSourceData = {};
+
+                    METRICS.forEach(metric => {
+                        const sourceValue = sourceData[metric.key] || 0;
+                        const targetValue = targetData[metric.key] || 0;
+
+                        if (metric.mode === 'add') {
+                            newTargetData[metric.key] = targetValue + sourceValue;
+                        } else if (metric.mode === 'copy') {
+                            newTargetData[metric.key] = sourceValue;
+                        }
+
+                        // Zero out source
+                        newSourceData[metric.key] = 0;
+                    });
+
+                    updated[targetStation] = newTargetData;
+                    updated[sourceStation] = newSourceData;
+
+                    return updated;
+                });
+
+                // Show success message
+                setTimeout(() => {
+                    setTransferStatus({
+                        visible: true,
+                        message: `✅ Successfully transferred all data from ${sourceStation} to ${targetStation}!`,
+                        type: 'success'
+                    });
+                }, 100);
+
+                // Clear highlighting and status
+                setTimeout(() => {
+                    setHighlightedStations([]);
+                    setIsTransferring(false);
+                    setTransferStatus({ visible: false, message: '', type: 'success' });
+                }, 3000);
+
+            }, [sourceStation, targetStation, isTransferring]);
+
+            // Split stations into North and South
+            const southStations = STATION_OPTIONS.slice(0, 10);
+            const northStations = STATION_OPTIONS.slice(10);
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+                    {/* Header */}
+                    <div className="text-center mb-8">
+                        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">
+                            ⚡ React Building Hourly Quicklook Dashboard
+                        </h1>
+                        <p className="text-gray-400 text-lg">
+                            Current Time: <span className="text-blue-300 font-mono">{currentTime.toLocaleString()}</span>
+                        </p>
+
+                        {/* Quick Actions */}
+                        <div className="flex justify-center gap-4 mt-4">
+                            <button
+                                onClick={() => setStationData(generateSampleData())}
+                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200"
+                            >
+                                🎲 Generate Sample Data
+                            </button>
+                            <button
+                                onClick={() => window.print()}
+                                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200"
+                            >
+                                🖨️ Print Dashboard
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Hourly Data Table */}
+                    <HourlyDataTable />
+
+                    {/* Transfer Controls */}
+                    <div className="mb-8">
+                        <TransferControls
+                            sourceStation={sourceStation}
+                            setSourceStation={setSourceStation}
+                            targetStation={targetStation}
+                            setTargetStation={setTargetStation}
+                            onTransfer={handleTransfer}
+                            isTransferring={isTransferring}
+                        />
+                    </div>
+
+                    {/* Station Tables */}
+                    <div className="grid lg:grid-cols-2 gap-8 mb-8">
+                        <StationsTable
+                            title="🔵 North Outbounds (S11-S22)"
+                            stations={northStations}
+                            data={stationData}
+                            highlightedStations={highlightedStations}
+                        />
+
+                        <StationsTable
+                            title="🔴 South Outbounds (S01-S10)"
+                            stations={southStations}
+                            data={stationData}
+                            highlightedStations={highlightedStations}
+                        />
+                    </div>
+
+                    {/* Statistics Summary */}
+                    <div className="grid md:grid-cols-3 gap-6">
+                        <div className="bg-slate-800 rounded-xl p-6 shadow-xl">
+                            <h3 className="text-xl font-bold text-blue-300 mb-4">📊 Total Volume</h3>
+                            <p className="text-3xl font-bold text-white">
+                                {Object.values(stationData).reduce((sum, station) => sum + (station.Vol || 0), 0).toLocaleString()}
+                            </p>
+                        </div>
+
+                        <div className="bg-slate-800 rounded-xl p-6 shadow-xl">
+                            <h3 className="text-xl font-bold text-green-300 mb-4">⏱️ Average Uptime</h3>
+                            <p className="text-3xl font-bold text-white">
+                                {(Object.values(stationData).reduce((sum, station) => sum + (station.UTPct || 0), 0) / STATION_OPTIONS.length).toFixed(1)}%
+                            </p>
+                        </div>
+
+                        <div className="bg-slate-800 rounded-xl p-6 shadow-xl">
+                            <h3 className="text-xl font-bold text-red-300 mb-4">⛔ Total Belt Stops</h3>
+                            <p className="text-3xl font-bold text-white">
+                                {Object.values(stationData).reduce((sum, station) => sum + (station.BS || 0), 0)}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Transfer Status Modal */}
+                    <TransferStatusModal
+                        isVisible={transferStatus.visible}
+                        message={transferStatus.message}
+                        type={transferStatus.type}
+                    />
+                </div>
+            );
+        };
+
+        // ==========================================
+        // RENDER APP
+        // ==========================================
+
+        ReactDOM.render(<Dashboard />, document.getElementById('root'));
+    </script>
+</body>
+</html>
