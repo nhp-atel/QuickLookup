@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Enhanced Transfer Dashboard - Fixed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+
+    <!-- Include jQuery from CDN instead of local files -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            background-color: #2c3e50;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            zoom: 80%;
+        }
+
+        #table1 td {
+            border: none;
+        }
+
+        td {
+            text-align: center;
+            border: 1px solid gray;
+            padding: 8px;
+        }
+
+        th {
+            text-align: center;
+            font-weight: bold;
+            border: 2px solid white;
+            padding: 8px;
+        }
+
+        #South th {
+            text-align: center;
+            font-weight: bold;
+            border: 2px solid white;
+            background: steelblue;
+        }
+
+        #North th {
+            text-align: center;
+            font-weight: bold;
+            border: 2px solid white;
+            background: rgba(255, 140, 0, 0.636);
+        }
+
+        tr:nth-child(even) {
+            background-color: #aab0b6;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #a7b4c1c4;
+        }
+
+        .rowhead {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Transfer controls styling */
+        .transfer-section {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            padding: 25px;
+            margin: 30px auto;
+            border-radius: 12px;
+            border: 3px solid #3498db;
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+            max-width: 800px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .transfer-section h3 {
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .transfer-controls.unified {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 2px solid #3498db;
+        }
+
+        .transfer-controls.unified label {
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 14px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+
+        .transfer-controls.unified select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid #3498db;
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 14px;
+            min-width: 120px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .transfer-controls.unified select:hover {
+            border-color: #e74c3c;
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+        }
+
+        .transfer-controls.unified button {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .transfer-controls.unified button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6);
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+        }
+
+        .transfer-controls.unified button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Status styling */
+        .transfer-status {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: #ffffff;
+            padding: 20px 40px;
+            border-radius: 10px;
+            border: 2px solid #3498db;
+            font-size: 18px;
+            font-weight: bold;
+            z-index: 1000;
+            display: none;
+        }
+
+        /* Error styling */
+        .error-panel {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 2px solid #c0392b;
+        }
+
+        .success-panel {
+            background: #27ae60;
+            color: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 2px solid #229954;
+        }
+
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #34495e;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div id="dt" class='float-right'>Loading...</div>
+        <br />
+
+        <!-- Error/Status Display -->
+        <div id="errorDisplay"></div>
+
+        <!-- Sample Data Button -->
+        <div style="text-align: center; margin: 20px 0;">
+            <button onclick="addSampleDataForTesting()" style="padding: 12px 24px; background: #27ae60; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                🎲 Add Sample Data
+            </button>
+        </div>
+
+        <!-- Main Transfer Section -->
+        <div class="transfer-section">
+            <h3>🔄 Enhanced Station Data Transfer</h3>
+
+            <div class="transfer-controls unified">
+                <div class="transfer-row" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+                    <label for="masterSource">Source Station:</label>
+                    <select id="masterSource">
+                        <option value="S01">S1</option>
+                        <option value="S02">S2</option>
+                        <option value="S03">S3</option>
+                        <option value="S04">S4</option>
+                        <option value="S05">S5</option>
+                        <option value="S06">S6</option>
+                        <option value="S07">S7</option>
+                        <option value="S08">S8</option>
+                        <option value="S09">S9</option>
+                        <option value="S10">S10</option>
+                        <option value="S11">S11</option>
+                        <option value="S12">S12</option>
+                    </select>
+
+                    <label for="masterTarget">Target Station:</label>
+                    <select id="masterTarget">
+                        <option value="S01">S1</option>
+                        <option value="S02">S2</option>
+                        <option value="S03">S3</option>
+                        <option value="S04">S4</option>
+                        <option value="S05">S5</option>
+                        <option value="S06">S6</option>
+                        <option value="S07">S7</option>
+                        <option value="S08">S8</option>
+                        <option value="S09">S9</option>
+                        <option value="S10">S10</option>
+                        <option value="S11">S11</option>
+                        <option value="S12">S12</option>
+                    </select>
+
+                    <button id="transferBtn" onclick="handleEnhancedTransfer()">🔄 SWAP DATA</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Swap Management Controls -->
+        <div class="transfer-section" style="margin-top: 15px;">
+            <h3>🔧 Swap Management & Status</h3>
+
+            <div class="transfer-controls unified">
+                <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;">
+
+                    <!-- Active Swaps Display -->
+                    <div id="activeSwapsDisplay" style="background: rgba(52, 152, 219, 0.1); padding: 10px 15px; border-radius: 8px; border: 2px solid #3498db; min-width: 200px;">
+                        <strong style="color: #3498db;">Active Swaps:</strong>
+                        <div id="swapsList" style="color: white; margin-top: 5px; font-size: 14px;">
+                            No active swaps
+                        </div>
+                    </div>
+
+                    <button onclick="clearAllSwaps()" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                        🗑️ Clear All Swaps
+                    </button>
+
+                    <button onclick="refreshSwapDisplay()" style="background: linear-gradient(135deg, #27ae60, #229954); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                        🔄 Refresh Status
+                    </button>
+
+                    <button onclick="simulateDataReload()" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                        ⏰ Test Hour Change
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Data Tables -->
+        <div style="display: flex; gap: 20px; margin: 30px 0;">
+            <!-- North Stations -->
+            <table id="North" style="flex: 1;">
+                <thead>
+                    <tr>
+                        <th colspan="6">North Stations</th>
+                    </tr>
+                    <tr>
+                        <th>Station</th>
+                        <th>Volume</th>
+                        <th>Belt Stops</th>
+                        <th>Uptime %</th>
+                        <th>Decline %</th>
+                        <th>Chutefulls</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="rowhead">S11</td>
+                        <td id="S11_Vol">&nbsp;</td>
+                        <td id="S11_BS">&nbsp;</td>
+                        <td id="S11_UTPct">&nbsp;</td>
+                        <td id="S11_DecPct">&nbsp;</td>
+                        <td id="S11_CF">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="rowhead">S12</td>
+                        <td id="S12_Vol">&nbsp;</td>
+                        <td id="S12_BS">&nbsp;</td>
+                        <td id="S12_UTPct">&nbsp;</td>
+                        <td id="S12_DecPct">&nbsp;</td>
+                        <td id="S12_CF">&nbsp;</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- South Stations -->
+            <table id="South" style="flex: 1;">
+                <thead>
+                    <tr>
+                        <th colspan="6">South Stations</th>
+                    </tr>
+                    <tr>
+                        <th>Station</th>
+                        <th>Volume</th>
+                        <th>Belt Stops</th>
+                        <th>Uptime %</th>
+                        <th>Decline %</th>
+                        <th>Chutefulls</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="rowhead">S01</td>
+                        <td id="S01_Vol">&nbsp;</td>
+                        <td id="S01_BS">&nbsp;</td>
+                        <td id="S01_UTPct">&nbsp;</td>
+                        <td id="S01_DecPct">&nbsp;</td>
+                        <td id="S01_CF">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="rowhead">S02</td>
+                        <td id="S02_Vol">&nbsp;</td>
+                        <td id="S02_BS">&nbsp;</td>
+                        <td id="S02_UTPct">&nbsp;</td>
+                        <td id="S02_DecPct">&nbsp;</td>
+                        <td id="S02_CF">&nbsp;</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Transfer Status Indicator -->
+        <div id="transferStatus" class="transfer-status">
+            Processing...
+        </div>
+    </div>
+
+    <script>
+        // Initialize page
+        document.getElementById('dt').textContent = new Date().toLocaleString();
+
+        // Show error function
+        function showError(message) {
+            const errorDiv = document.getElementById('errorDisplay');
+            errorDiv.innerHTML = `<div class="error-panel">❌ ${message}</div>`;
+            console.error(message);
+        }
+
+        // Show success function
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('errorDisplay');
+            errorDiv.innerHTML = `<div class="success-panel">✅ ${message}</div>`;
+            console.log(message);
+        }
+
+        // Enhanced metrics configuration for atomic swapping
+        const METRICS = [
+            { key: "Vol", type: "int", mode: "swap", label: "Volume" },
+            { key: "BS", type: "int", mode: "swap", label: "Belt Stops" },
+            { key: "UTPct", type: "percent", mode: "swap", label: "Uptime %" },
+            { key: "DecPct", type: "percent", mode: "swap", label: "Decline %" },
+            { key: "CF", type: "int", mode: "swap", label: "Chutefulls" }
+        ];
+
+        // Global swap state tracking
+        let swapStateManager = {
+            activeSwaps: new Map(),
+            originalValues: new Map(),
+
+            init() {
+                this.activeSwaps.clear();
+                this.originalValues.clear();
+                console.log('SwapStateManager initialized');
+            },
+
+            registerSwap(stationA, stationB) {
+                console.log(`Registering swap: ${stationA} ↔ ${stationB}`);
+
+                if (!this.originalValues.has(stationA)) {
+                    this.storeOriginalValues(stationA);
+                }
+                if (!this.originalValues.has(stationB)) {
+                    this.storeOriginalValues(stationB);
+                }
+
+                this.activeSwaps.set(stationA, stationB);
+                this.activeSwaps.set(stationB, stationA);
+
+                console.log('Active swaps:', Array.from(this.activeSwaps.entries()));
+            },
+
+            storeOriginalValues(station) {
+                const values = {};
+                METRICS.forEach(metric => {
+                    const cellId = `${station}_${metric.key}`;
+                    const cell = document.getElementById(cellId);
+                    if (cell) {
+                        values[metric.key] = {
+                            value: readCellValue(cell, metric.type),
+                            displayText: cell.textContent.trim()
+                        };
+                    }
+                });
+                this.originalValues.set(station, values);
+                console.log(`Stored original values for ${station}:`, values);
+            },
+
+            getCurrentMapping(station) {
+                return this.activeSwaps.get(station) || station;
+            },
+
+            isSwapped(station) {
+                return this.activeSwaps.has(station);
+            },
+
+            getAllSwappedStations() {
+                return Array.from(this.activeSwaps.keys());
+            },
+
+            clearAllSwaps() {
+                const swappedStations = this.getAllSwappedStations();
+                this.init();
+                console.log('Cleared all swaps');
+                return swappedStations;
+            },
+
+            getSwapSummary() {
+                const swaps = [];
+                const processed = new Set();
+
+                this.activeSwaps.forEach((target, source) => {
+                    if (!processed.has(source) && !processed.has(target)) {
+                        swaps.push({ source, target });
+                        processed.add(source);
+                        processed.add(target);
+                    }
+                });
+
+                return swaps;
+            }
+        };
+
+        // Swap restoration functions
+        const swapInterceptor = {
+            beforeDataLoad() {
+                console.log('Preserving swap state before data load...');
+                return swapStateManager.getAllSwappedStations();
+            },
+
+            restoreSwapsByCurrentState() {
+                console.log('Restoring swaps by analyzing current state...');
+
+                const swapSummary = swapStateManager.getSwapSummary();
+                swapSummary.forEach(swap => {
+                    this.enforceSwapInDOM(swap.source, swap.target);
+                });
+            },
+
+            enforceSwapInDOM(stationA, stationB) {
+                METRICS.forEach(metric => {
+                    const cellA = document.getElementById(`${stationA}_${metric.key}`);
+                    const cellB = document.getElementById(`${stationB}_${metric.key}`);
+
+                    if (cellA && cellB) {
+                        const originalA = swapStateManager.originalValues.get(stationA);
+                        const originalB = swapStateManager.originalValues.get(stationB);
+
+                        if (originalA && originalB && originalA[metric.key] && originalB[metric.key]) {
+                            writeCellValue(cellA, originalB[metric.key].value, metric.type);
+                            writeCellValue(cellB, originalA[metric.key].value, metric.type);
+                        }
+                    }
+                });
+            }
+        };
+
+        // Enhanced cell value reading
+        function readCellValue(cell, type) {
+            const txt = cell.textContent.replace(/\u00A0/g, "").trim();
+            if (txt === "" || txt === "&nbsp;") return 0;
+            if (type === "percent") {
+                const m = txt.match(/-?\d*\.?\d+/);
+                if (!m) return null;
+                const n = parseFloat(m[0]);
+                return Number.isNaN(n) ? null : n;
+            }
+            if (type === "float") {
+                const n = parseFloat(txt.replace(/,/g, ""));
+                return Number.isNaN(n) ? null : n;
+            }
+            const n = parseInt(txt.replace(/,/g, ""), 10);
+            return Number.isNaN(n) ? null : n;
+        }
+
+        // Enhanced cell value writing
+        function writeCellValue(cell, value, type) {
+            if (value === 0) {
+                cell.innerHTML = "&nbsp;";
+                return;
+            }
+            if (type === "percent") {
+                cell.textContent = `${value}%`;
+                return;
+            }
+            if (type === "float") {
+                cell.textContent = Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 });
+                return;
+            }
+            cell.textContent = parseInt(value, 10).toLocaleString();
+        }
+
+        function atomicSwapStations(sourceStation, targetStation) {
+            // Register this swap with the state manager
+            swapStateManager.registerSwap(sourceStation, targetStation);
+
+            // Extract current values for both stations
+            const sourceValues = {};
+            const targetValues = {};
+
+            METRICS.forEach(metric => {
+                const sourceCellId = `${sourceStation}_${metric.key}`;
+                const targetCellId = `${targetStation}_${metric.key}`;
+
+                const sourceCell = document.getElementById(sourceCellId);
+                const targetCell = document.getElementById(targetCellId);
+
+                if (sourceCell && targetCell) {
+                    sourceValues[metric.key] = readCellValue(sourceCell, metric.type);
+                    targetValues[metric.key] = readCellValue(targetCell, metric.type);
+                }
+            });
+
+            // Perform atomic swap
+            let swappedCount = 0;
+            METRICS.forEach(metric => {
+                const sourceCellId = `${sourceStation}_${metric.key}`;
+                const targetCellId = `${targetStation}_${metric.key}`;
+
+                const sourceCell = document.getElementById(sourceCellId);
+                const targetCell = document.getElementById(targetCellId);
+
+                if (sourceCell && targetCell) {
+                    writeCellValue(sourceCell, targetValues[metric.key], metric.type);
+                    writeCellValue(targetCell, sourceValues[metric.key], metric.type);
+                    swappedCount++;
+                }
+            });
+
+            return swappedCount === METRICS.length;
+        }
+
+        // Show transfer status
+        function showTransferStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('transferStatus');
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+
+            if (type === 'success') {
+                statusDiv.style.borderColor = '#27ae60';
+            } else if (type === 'warning') {
+                statusDiv.style.borderColor = '#f39c12';
+            } else if (type === 'error') {
+                statusDiv.style.borderColor = '#e74c3c';
+            } else {
+                statusDiv.style.borderColor = '#3498db';
+            }
+
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Main transfer handler
+        function handleEnhancedTransfer() {
+            try {
+                console.log('handleEnhancedTransfer called');
+
+                const btn = document.getElementById('transferBtn');
+                btn.disabled = true;
+
+                const src = document.getElementById('masterSource').value;
+                const dst = document.getElementById('masterTarget').value;
+
+                console.log(`Source: ${src}, Target: ${dst}`);
+
+                if (src === dst) {
+                    alert('Source and target must be different.');
+                    btn.disabled = false;
+                    return;
+                }
+
+                if (!src || !dst) {
+                    alert('Please select both source and target stations.');
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Check if both stations have data
+                const srcCell = document.getElementById(`${src}_Vol`);
+                const dstCell = document.getElementById(`${dst}_Vol`);
+
+                if (!srcCell || !dstCell) {
+                    showError(`Station cells not found. Please ensure ${src} and ${dst} exist in the table.`);
+                    btn.disabled = false;
+                    return;
+                }
+
+                if (srcCell.textContent.trim() === '' || srcCell.textContent.trim() === '&nbsp;' ||
+                    dstCell.textContent.trim() === '' || dstCell.textContent.trim() === '&nbsp;') {
+                    showError('Please add sample data first before attempting to swap.');
+                    btn.disabled = false;
+                    return;
+                }
+
+                showTransferStatus('🔄 Performing swap...', 'info');
+
+                // Perform the swap
+                const success = atomicSwapStations(src, dst);
+
+                if (success) {
+                    showTransferStatus(`✅ Successfully swapped ${src} ↔ ${dst}!`, 'success');
+                    showSuccess(`Swap completed: ${src} ↔ ${dst}`);
+                    refreshSwapDisplay();
+                } else {
+                    showTransferStatus('❌ Swap failed!', 'error');
+                    showError('Swap operation failed');
+                }
+
+                btn.disabled = false;
+
+            } catch (error) {
+                console.error('Error in handleEnhancedTransfer:', error);
+                showError(`Swap failed: ${error.message}`);
+                document.getElementById('transferBtn').disabled = false;
+            }
+        }
+
+        // Clear all active swaps
+        function clearAllSwaps() {
+            try {
+                if (swapStateManager.getAllSwappedStations().length === 0) {
+                    showTransferStatus('No active swaps to clear', 'info');
+                    return;
+                }
+
+                const confirmMsg = `Are you sure you want to clear all active swaps?\n\nThis will restore all stations to their original data.`;
+                if (!confirm(confirmMsg)) {
+                    return;
+                }
+
+                const swappedStations = swapStateManager.clearAllSwaps();
+
+                // Reload sample data to restore original values
+                addSampleDataForTesting();
+
+                refreshSwapDisplay();
+                showTransferStatus(`✅ Cleared all swaps and restored ${swappedStations.length} stations`, 'success');
+
+            } catch (error) {
+                console.error('Error in clearAllSwaps:', error);
+                showError(`Clear failed: ${error.message}`);
+            }
+        }
+
+        // Update the swap display in the UI
+        function refreshSwapDisplay() {
+            try {
+                const swapsList = document.getElementById('swapsList');
+                const swapSummary = swapStateManager.getSwapSummary();
+
+                if (swapSummary.length === 0) {
+                    swapsList.innerHTML = 'No active swaps';
+                    swapsList.style.color = '#95a5a6';
+                } else {
+                    const swapTexts = swapSummary.map(swap =>
+                        `<span style="background: rgba(231, 76, 60, 0.2); padding: 2px 6px; border-radius: 4px; margin: 2px;">${swap.source} ↔ ${swap.target}</span>`
+                    );
+                    swapsList.innerHTML = swapTexts.join(' ');
+                    swapsList.style.color = '#e74c3c';
+                }
+
+                console.log(`Updated swap display: ${swapSummary.length} active swaps`);
+
+            } catch (error) {
+                console.error('Error in refreshSwapDisplay:', error);
+                showError(`Display update failed: ${error.message}`);
+            }
+        }
+
+        // Simulate data reload (like hour change)
+        function simulateDataReload() {
+            try {
+                showTransferStatus('⏰ Simulating hour change...', 'warning');
+
+                // Preserve swap state
+                const preservedStations = swapInterceptor.beforeDataLoad();
+
+                // Simulate clearing and reloading data
+                setTimeout(() => {
+                    console.log('Simulating data clear and reload...');
+
+                    // Reset to original server data
+                    addSampleDataForTesting();
+
+                    // Restore swaps after a delay
+                    setTimeout(() => {
+                        swapInterceptor.restoreSwapsByCurrentState();
+
+                        const swapSummary = swapStateManager.getSwapSummary();
+                        if (swapSummary.length > 0) {
+                            showTransferStatus('🎉 Swaps persisted through hour change!', 'success');
+                            showSuccess('Hour change simulation completed - swaps preserved!');
+                        } else {
+                            showTransferStatus('ℹ️ No swaps to restore', 'info');
+                        }
+                    }, 300);
+
+                }, 500);
+
+            } catch (error) {
+                console.error('Error in simulateDataReload:', error);
+                showError(`Simulation failed: ${error.message}`);
+            }
+        }
+
+        // Sample data for testing
+        function addSampleDataForTesting() {
+            try {
+                const sampleData = {
+                    'S01_Vol': '1,500', 'S01_BS': '8', 'S01_UTPct': '92.3%', 'S01_DecPct': '2.1%', 'S01_CF': '4',
+                    'S02_Vol': '2,750', 'S02_BS': '15', 'S02_UTPct': '88.7%', 'S02_DecPct': '3.8%', 'S02_CF': '9',
+                    'S11_Vol': '3,250', 'S11_BS': '12', 'S11_UTPct': '94.1%', 'S11_DecPct': '1.8%', 'S11_CF': '6',
+                    'S12_Vol': '980', 'S12_BS': '22', 'S12_UTPct': '87.2%', 'S12_DecPct': '4.2%', 'S12_CF': '11'
+                };
+
+                Object.entries(sampleData).forEach(([id, value]) => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.textContent = value;
+                    }
+                });
+
+                showSuccess('Sample data loaded successfully!');
+                console.log('Sample data loaded');
+
+            } catch (error) {
+                console.error('Error in addSampleDataForTesting:', error);
+                showError(`Sample data loading failed: ${error.message}`);
+            }
+        }
+
+        // Initialize the swap state manager
+        swapStateManager.init();
+
+        // Initialize swap display
+        setTimeout(() => {
+            refreshSwapDisplay();
+        }, 500);
+
+        console.log('✅ Enhanced Transfer Dashboard - Fixed version loaded successfully!');
+        showSuccess('Dashboard loaded - Click "Add Sample Data" to start testing');
+
+    </script>
+</body>
+</html>
