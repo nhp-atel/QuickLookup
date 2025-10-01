@@ -1709,17 +1709,31 @@
             // SWAP STATE MANAGER FOR PERSISTENCE
             // ==========================================
 
-            // Global swap state tracking
+            /*
+             * KEY FIX EXPLANATION:
+             *
+             * PROBLEM: When hour changes (e.g., 1:00 → 1:30), swaps were storing OLD data
+             *
+             * OLD APPROACH (BROKEN):
+             * 1. Hour 1:00 - Swap S01↔S02, cache their values
+             * 2. Hour 1:30 - Server sends NEW data
+             * 3. Restore function used CACHED values from Hour 1:00 ❌
+             *
+             * NEW APPROACH (FIXED):
+             * 1. Hour 1:00 - Swap S01↔S02, only remember WHICH stations are swapped
+             * 2. Hour 1:30 - Server sends NEW data to DOM
+             * 3. Read NEW data from DOM and swap it according to mapping ✓
+             *
+             * This ensures swaps always operate on fresh server data!
+             */
+
+            // Global swap state tracking - FIXED VERSION
             let swapStateManager = {
-                activeSwaps: new Map(), // station -> currentMappedStation
-                originalValues: new Map(), // station -> {metric -> value}
-                swapChains: new Map(), // tracks swap chains for complex swaps
+                activeSwaps: new Map(), // station -> partner station (bidirectional mapping)
 
                 // Initialize or reset swap state
                 init() {
                     this.activeSwaps.clear();
-                    this.originalValues.clear();
-                    this.swapChains.clear();
                     console.log('SwapStateManager initialized');
                 },
 
@@ -1727,61 +1741,16 @@
                 registerSwap(stationA, stationB) {
                     console.log(`Registering swap: ${stationA} ↔ ${stationB}`);
 
-                    // Store original values if not already stored
-                    if (!this.originalValues.has(stationA)) {
-                        this.storeOriginalValues(stationA);
-                    }
-                    if (!this.originalValues.has(stationB)) {
-                        this.storeOriginalValues(stationB);
-                    }
-
-                    // Handle swap chains - if either station is already swapped
-                    const currentA = this.activeSwaps.get(stationA) || stationA;
-                    const currentB = this.activeSwaps.get(stationB) || stationB;
-
-                    // Update active swaps
-                    this.activeSwaps.set(stationA, currentB);
-                    this.activeSwaps.set(stationB, currentA);
-
-                    // Update swap chains
-                    this.updateSwapChains(stationA, stationB);
+                    // Store bidirectional mapping
+                    this.activeSwaps.set(stationA, stationB);
+                    this.activeSwaps.set(stationB, stationA);
 
                     console.log('Active swaps:', Array.from(this.activeSwaps.entries()));
                 },
 
-                // Store original values for a station before any swaps
-                storeOriginalValues(station) {
-                    const values = {};
-                    METRICS.forEach(metric => {
-                        const cellId = `${station}_${metric.key}`;
-                        const cell = document.getElementById(cellId);
-                        if (cell) {
-                            values[metric.key] = {
-                                value: readCellValue(cell, metric.type),
-                                displayText: cell.textContent.trim()
-                            };
-                        }
-                    });
-                    this.originalValues.set(station, values);
-                    console.log(`Stored original values for ${station}:`, values);
-                },
-
-                // Update swap chains for complex multi-station swaps
-                updateSwapChains(stationA, stationB) {
-                    // Simple chain tracking - can be enhanced for complex scenarios
-                    const chainA = this.swapChains.get(stationA) || [stationA];
-                    const chainB = this.swapChains.get(stationB) || [stationB];
-
-                    // Merge chains
-                    const newChain = [...chainA, ...chainB];
-                    newChain.forEach(station => {
-                        this.swapChains.set(station, newChain);
-                    });
-                },
-
-                // Get current mapped station (where station's data should come from)
-                getCurrentMapping(station) {
-                    return this.activeSwaps.get(station) || station;
+                // Get the partner station that this station is swapped with
+                getSwapPartner(station) {
+                    return this.activeSwaps.get(station);
                 },
 
                 // Check if a station is involved in any swaps
@@ -1836,114 +1805,67 @@
             // DATA LOAD INTERCEPTOR FOR SWAP PERSISTENCE
             // ==========================================
 
-            // Swap restoration functions
+            // Swap restoration functions - FIXED VERSION
             const swapInterceptor = {
                 // Store current swap state before data load
                 beforeDataLoad() {
                     console.log('Preserving swap state before data load...');
-                    // The swap state manager already tracks everything we need
+                    // Just return the list of swapped stations so we know what to process
                     return swapStateManager.getAllSwappedStations();
                 },
 
-                // Restore swap state after data load
-                afterDataLoad(preservedStations = []) {
-                    if (preservedStations.length === 0) return;
-
-                    console.log('Restoring swap state after data load...', preservedStations);
-
-                    // For each swapped station, apply the current mapping
-                    preservedStations.forEach(station => {
-                        const targetStation = swapStateManager.getCurrentMapping(station);
-                        if (targetStation !== station) {
-                            this.applySwappedValues(station, targetStation);
-                        }
-                    });
-
-                    console.log('Swap state restoration completed');
-                },
-
-                // Apply swapped values between two stations based on current state
-                applySwappedValues(station, targetStation) {
-                    METRICS.forEach(metric => {
-                        const stationCellId = `${station}_${metric.key}`;
-                        const targetCellId = `${targetStation}_${metric.key}`;
-
-                        const stationCell = document.getElementById(stationCellId);
-                        const targetCell = document.getElementById(targetCellId);
-
-                        if (stationCell && targetCell) {
-                            // Get the value that should be in this station based on swap state
-                            const sourceForStation = this.getDataSourceForStation(station);
-                            const sourceForTarget = this.getDataSourceForStation(targetStation);
-
-                            // Apply the swapped data
-                            this.copyMetricValue(sourceForStation, station, metric);
-                            this.copyMetricValue(sourceForTarget, targetStation, metric);
-                        }
-                    });
-                },
-
-                // Determine which station's data should appear in the given station slot
-                getDataSourceForStation(station) {
-                    // Walk the swap chain to find the original data source
-                    let current = station;
-                    let visited = new Set();
-
-                    while (swapStateManager.activeSwaps.has(current) && !visited.has(current)) {
-                        visited.add(current);
-                        current = swapStateManager.activeSwaps.get(current);
-                    }
-
-                    return current;
-                },
-
-                // Copy a metric value from source station to target station
-                copyMetricValue(sourceStation, targetStation, metric) {
-                    const sourceCellId = `${sourceStation}_${metric.key}`;
-                    const targetCellId = `${targetStation}_${metric.key}`;
-
-                    const sourceCell = document.getElementById(sourceCellId);
-                    const targetCell = document.getElementById(targetCellId);
-
-                    if (sourceCell && targetCell && sourceStation !== targetStation) {
-                        // Get the original value for the source station
-                        const originalValues = swapStateManager.originalValues.get(sourceStation);
-                        if (originalValues && originalValues[metric.key]) {
-                            writeCellValue(targetCell, originalValues[metric.key].value, metric.type);
-                        }
-                    }
-                },
-
-                // Alternative restoration method using current DOM state
+                // Restore swap state after data load - THIS IS THE KEY FIX
                 restoreSwapsByCurrentState() {
-                    console.log('Restoring swaps by analyzing current state...');
+                    console.log('Restoring swaps using FRESH server data...');
 
                     const swapSummary = swapStateManager.getSwapSummary();
+                    if (swapSummary.length === 0) {
+                        console.log('No active swaps to restore');
+                        return;
+                    }
+
+                    // For each swap pair, swap the FRESH data that just came from the server
                     swapSummary.forEach(swap => {
-                        // For each active swap, ensure the data is correctly placed
-                        this.enforceSwapInDOM(swap.source, swap.target);
+                        console.log(`Applying swap: ${swap.source} ↔ ${swap.target} to fresh data`);
+                        this.swapFreshData(swap.source, swap.target);
                     });
+
+                    console.log('Swap restoration completed using fresh server data');
                 },
 
-                // Enforce a specific swap in the DOM
-                enforceSwapInDOM(stationA, stationB) {
+                // Swap fresh data between two stations (data that just loaded from server)
+                swapFreshData(stationA, stationB) {
+                    // CRITICAL: We read the CURRENT values in the DOM (fresh from server)
+                    // and then swap them. This ensures we're always working with the latest data.
+
+                    // Step 1: Read fresh values from both stations
+                    const freshDataA = {};
+                    const freshDataB = {};
+
                     METRICS.forEach(metric => {
                         const cellA = document.getElementById(`${stationA}_${metric.key}`);
                         const cellB = document.getElementById(`${stationB}_${metric.key}`);
 
                         if (cellA && cellB) {
-                            // Get original values
-                            const originalA = swapStateManager.originalValues.get(stationA);
-                            const originalB = swapStateManager.originalValues.get(stationB);
-
-                            if (originalA && originalB && originalA[metric.key] && originalB[metric.key]) {
-                                // Station A should show Station B's original data
-                                writeCellValue(cellA, originalB[metric.key].value, metric.type);
-                                // Station B should show Station A's original data
-                                writeCellValue(cellB, originalA[metric.key].value, metric.type);
-                            }
+                            freshDataA[metric.key] = readCellValue(cellA, metric.type);
+                            freshDataB[metric.key] = readCellValue(cellB, metric.type);
                         }
                     });
+
+                    // Step 2: Write swapped values (A's fresh data goes to B, B's fresh data goes to A)
+                    METRICS.forEach(metric => {
+                        const cellA = document.getElementById(`${stationA}_${metric.key}`);
+                        const cellB = document.getElementById(`${stationB}_${metric.key}`);
+
+                        if (cellA && cellB) {
+                            // Station A gets Station B's fresh data
+                            writeCellValue(cellA, freshDataB[metric.key], metric.type);
+                            // Station B gets Station A's fresh data
+                            writeCellValue(cellB, freshDataA[metric.key], metric.type);
+                        }
+                    });
+
+                    console.log(`Swapped fresh data: ${stationA} ↔ ${stationB}`);
                 }
             };
 
@@ -2041,13 +1963,14 @@
             // ==========================================
 
             function atomicSwapStations(sourceStation, targetStation) {
-                // Create backup before any changes
+                // Create backup before any changes (for undo functionality)
                 const backup = createStateBackup([sourceStation, targetStation]);
 
                 // SWAP PERSISTENCE: Register this swap with the state manager
+                // This is critical - it tracks that these stations are swapped
                 swapStateManager.registerSwap(sourceStation, targetStation);
 
-                // Extract current values for both stations
+                // Extract CURRENT values for both stations (from DOM)
                 const sourceValues = {};
                 const targetValues = {};
 
@@ -2074,15 +1997,15 @@
                     const targetCell = document.getElementById(targetCellId);
 
                     if (sourceCell && targetCell) {
-                        // Write target's original value to source
+                        // Write target's value to source
                         writeCellValue(sourceCell, targetValues[metric.key], metric.type);
-                        // Write source's original value to target
+                        // Write source's value to target
                         writeCellValue(targetCell, sourceValues[metric.key], metric.type);
                         swappedCount++;
                     }
                 });
 
-                // Add to transaction history
+                // Add to transaction history (for undo functionality)
                 addToTransactionHistory({
                     type: 'swap',
                     sourceStation: sourceStation,
