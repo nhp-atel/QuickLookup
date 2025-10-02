@@ -1687,6 +1687,36 @@
             });
 
             // ==========================================
+            // CROSS-TAB SYNC INITIALIZATION
+            // ==========================================
+
+            // Initialize cross-tab synchronization listener
+            crossTabSwapSync.initListener(() => {
+                console.log('Swap state changed in another tab - syncing...');
+
+                // Reload swap state from localStorage
+                const newSwapState = crossTabSwapSync.loadSwapState();
+                swapStateManager.activeSwaps = newSwapState;
+
+                // Re-apply swaps to the current data
+                setTimeout(() => {
+                    swapInterceptor.restoreSwapsByCurrentState();
+                    refreshSwapDisplay();
+                }, 100);
+            });
+
+            // Load initial swap state from localStorage on page load
+            setTimeout(() => {
+                const savedSwaps = crossTabSwapSync.loadSwapState();
+                if (savedSwaps.size > 0) {
+                    console.log('Loading saved swaps from localStorage on page load...');
+                    swapStateManager.activeSwaps = savedSwaps;
+                    swapInterceptor.restoreSwapsByCurrentState();
+                    refreshSwapDisplay();
+                }
+            }, 500);
+
+            // ==========================================
             // ENHANCED TRANSFER FUNCTIONALITY
             // ==========================================
 
@@ -1734,7 +1764,12 @@
                 // Initialize or reset swap state
                 init() {
                     this.activeSwaps.clear();
-                    console.log('SwapStateManager initialized');
+
+                    // Load existing swaps from localStorage on init
+                    const savedSwaps = crossTabSwapSync.loadSwapState();
+                    this.activeSwaps = savedSwaps;
+
+                    console.log('SwapStateManager initialized with saved swaps:', Array.from(this.activeSwaps.entries()));
                 },
 
                 // Register a swap between two stations
@@ -1744,6 +1779,9 @@
                     // Store bidirectional mapping
                     this.activeSwaps.set(stationA, stationB);
                     this.activeSwaps.set(stationB, stationA);
+
+                    // Save to localStorage to sync with other tabs
+                    crossTabSwapSync.saveSwapState(this.activeSwaps);
 
                     console.log('Active swaps:', Array.from(this.activeSwaps.entries()));
                 },
@@ -1776,7 +1814,11 @@
                 // Clear all swaps
                 clearAllSwaps() {
                     const swappedStations = this.getAllSwappedStations();
-                    this.init();
+                    this.activeSwaps.clear();
+
+                    // Clear from localStorage to sync with other tabs
+                    crossTabSwapSync.clearSwapState();
+
                     console.log('Cleared all swaps');
                     return swappedStations;
                 },
@@ -1800,6 +1842,57 @@
 
             // Initialize the swap state manager
             swapStateManager.init();
+
+            // ==========================================
+            // CROSS-TAB SYNCHRONIZATION SYSTEM
+            // ==========================================
+
+            const crossTabSwapSync = {
+                STORAGE_KEY: 'dashboard_active_swaps',
+
+                // Save swap state to localStorage
+                saveSwapState(swapMap) {
+                    const swapArray = Array.from(swapMap.entries());
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(swapArray));
+
+                    // Trigger storage event for other tabs
+                    localStorage.setItem('swap_update_trigger', Date.now().toString());
+                    console.log('Saved swap state to localStorage:', swapArray);
+                },
+
+                // Load swap state from localStorage
+                loadSwapState() {
+                    const stored = localStorage.getItem(this.STORAGE_KEY);
+                    if (!stored) return new Map();
+
+                    try {
+                        const swapArray = JSON.parse(stored);
+                        console.log('Loaded swap state from localStorage:', swapArray);
+                        return new Map(swapArray);
+                    } catch (e) {
+                        console.error('Failed to parse swap state:', e);
+                        return new Map();
+                    }
+                },
+
+                // Clear swap state from localStorage
+                clearSwapState() {
+                    localStorage.removeItem(this.STORAGE_KEY);
+                    localStorage.setItem('swap_update_trigger', Date.now().toString());
+                    console.log('Cleared swap state from localStorage');
+                },
+
+                // Listen for changes from other tabs
+                initListener(callback) {
+                    window.addEventListener('storage', (e) => {
+                        if (e.key === 'swap_update_trigger') {
+                            console.log('Storage event detected - another tab updated swaps');
+                            callback();
+                        }
+                    });
+                    console.log('Cross-tab sync listener initialized');
+                }
+            };
 
             // ==========================================
             // DATA LOAD INTERCEPTOR FOR SWAP PERSISTENCE
@@ -2710,17 +2803,18 @@
                     const swapTexts = swapSummary.map(swap =>
                         `<span style="background: rgba(231, 76, 60, 0.2); padding: 2px 6px; border-radius: 4px; margin: 2px;">${swap.source} ↔ ${swap.target}</span>`
                     );
-                    swapsList.innerHTML = swapTexts.join(' ');
+                    swapsList.innerHTML = swapTexts.join(' ') +
+                        ' <span style="color: #3498db; margin-left: 10px;">🔄 Synced across all tabs</span>';
                     swapsList.style.color = '#e74c3c';
                 }
 
                 // Update status info
                 const statusInfo = document.getElementById('swapStatusInfo');
                 if (swapSummary.length > 0) {
-                    statusInfo.innerHTML = `${swapSummary.length} active swap(s) - Data will persist across hour changes and auto-refresh`;
+                    statusInfo.innerHTML = `${swapSummary.length} active swap(s) - Synchronized across all browser tabs`;
                     statusInfo.style.color = '#f39c12';
                 } else {
-                    statusInfo.innerHTML = 'Swaps will persist across hour changes and auto-refresh cycles';
+                    statusInfo.innerHTML = 'Swaps will persist across tabs, hour changes, and auto-refresh cycles';
                     statusInfo.style.color = '#bdc3c7';
                 }
             }
