@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Unified Transfer Test</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #333;
+        }
+
+        td, th {
+            border: 1px solid #666;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #555;
+        }
+
+        /* UNIFIED Transfer Controls Styling */
+        .transfer-section {
+            background-color: #2c3e50;
+            padding: 25px;
+            margin: 30px auto;
+            border-radius: 10px;
+            border: 3px solid #3498db;
+            max-width: 800px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        .transfer-section h3 {
+            color: #ecf0f1;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 15px;
+        }
+
+        .unified-transfer-controls {
+            background-color: #34495e;
+            padding: 30px;
+            border-radius: 8px;
+            border: 2px solid #4a5c6a;
+            margin-bottom: 25px;
+        }
+
+        .transfer-selection {
+            display: grid;
+            grid-template-columns: 1fr 50px 1fr;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .station-group {
+            text-align: center;
+        }
+
+        .station-group h4 {
+            color: #3498db;
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .station-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 2px solid #555;
+            background-color: #2c3e50;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .station-group select:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
+        }
+
+        .transfer-arrow {
+            text-align: center;
+            font-size: 28px;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .metrics-preview {
+            background-color: #2c3e50;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #555;
+            margin-bottom: 25px;
+        }
+
+        .metrics-preview h4 {
+            color: #f39c12;
+            margin: 0 0 15px 0;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .metric-item {
+            background-color: #34495e;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #4a5c6a;
+            text-align: center;
+            font-size: 12px;
+            color: #ecf0f1;
+        }
+
+        .transfer-button-container {
+            text-align: center;
+        }
+
+        .unified-transfer-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+        }
+
+        .unified-transfer-btn:hover {
+            background: linear-gradient(45deg, #c0392b, #a93226);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+
+        .unified-transfer-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .transfer-status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            background-color: #1a1a1a;
+            border: 1px solid #555;
+            min-height: 100px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #ecf0f1;
+            overflow-y: auto;
+            max-height: 150px;
+        }
+
+        .status-success {
+            color: #2ecc71;
+        }
+
+        .status-error {
+            color: #e74c3c;
+        }
+
+        .status-warning {
+            color: #f39c12;
+        }
+
+        .test-btn {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .test-btn:hover {
+            background-color: #229954;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 UNIFIED TRANSFER TEST ENVIRONMENT</h1>
+
+    <div class="test-section">
+        <h3>📊 Sample Data Table</h3>
+        <table>
+            <tr>
+                <th>Station</th>
+                <th>Volume</th>
+                <th>Belt Stops</th>
+                <th>Uptime %</th>
+                <th>Decline %</th>
+                <th>Chute Full</th>
+                <th>Chute Full %</th>
+            </tr>
+            <tr>
+                <td>S01</td>
+                <td id="S01_Vol">2,100</td>
+                <td id="S01_BS">12</td>
+                <td id="S01_UTPct">96.8%</td>
+                <td id="S01_DecPct">1.2%</td>
+                <td id="S01_CF">4</td>
+                <td id="S01_CFPct">2.9%</td>
+            </tr>
+            <tr>
+                <td>S02</td>
+                <td id="S02_Vol">1,750</td>
+                <td id="S02_BS">20</td>
+                <td id="S02_UTPct">91.4%</td>
+                <td id="S02_DecPct">2.8%</td>
+                <td id="S02_CF">9</td>
+                <td id="S02_CFPct">6.1%</td>
+            </tr>
+            <tr>
+                <td>S11</td>
+                <td id="S11_Vol">1,250</td>
+                <td id="S11_BS">15</td>
+                <td id="S11_UTPct">92.5%</td>
+                <td id="S11_DecPct">2.1%</td>
+                <td id="S11_CF">8</td>
+                <td id="S11_CFPct">5.3%</td>
+            </tr>
+            <tr>
+                <td>S12</td>
+                <td id="S12_Vol">980</td>
+                <td id="S12_BS">22</td>
+                <td id="S12_UTPct">88.7%</td>
+                <td id="S12_DecPct">3.2%</td>
+                <td id="S12_CF">12</td>
+                <td id="S12_CFPct">7.8%</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- UNIFIED STATION TRANSFER SECTION -->
+    <div class="transfer-section">
+        <h3>🔄 UNIFIED STATION TRANSFER</h3>
+
+        <div class="unified-transfer-controls">
+            <div class="transfer-selection">
+                <div class="station-group">
+                    <h4>📤 SOURCE STATION</h4>
+                    <select id="sourceStation">
+                        <option value="">-- Select Source --</option>
+                        <option value="S01">S01 (South)</option>
+                        <option value="S02">S02 (South)</option>
+                        <option value="S11">S11 (North)</option>
+                        <option value="S12">S12 (North)</option>
+                    </select>
+                </div>
+
+                <div class="transfer-arrow">
+                    ⬌
+                </div>
+
+                <div class="station-group">
+                    <h4>📥 TARGET STATION</h4>
+                    <select id="targetStation">
+                        <option value="">-- Select Target --</option>
+                        <option value="S01">S01 (South)</option>
+                        <option value="S02">S02 (South)</option>
+                        <option value="S11">S11 (North)</option>
+                        <option value="S12">S12 (North)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="metrics-preview">
+                <h4>📊 METRICS TO BE TRANSFERRED</h4>
+                <div class="metrics-grid">
+                    <div class="metric-item">📦 Volume</div>
+                    <div class="metric-item">⛔ Belt Stops</div>
+                    <div class="metric-item">⏱️ Uptime %</div>
+                    <div class="metric-item">📉 Decline %</div>
+                    <div class="metric-item">🚫 Chute Full</div>
+                    <div class="metric-item">📊 Chute Full %</div>
+                </div>
+            </div>
+
+            <div class="transfer-button-container">
+                <button class="unified-transfer-btn" onclick="transferAllMetrics()">
+                    🔄 TRANSFER ALL METRICS
+                </button>
+            </div>
+
+            <div id="transferStatus" class="transfer-status">
+                Ready to transfer all metrics between stations...
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Controls -->
+    <div style="text-align: center; margin: 20px;">
+        <button class="test-btn" onclick="runQuickTest()">Run Quick Test</button>
+        <button class="test-btn" onclick="resetData()">Reset Data</button>
+        <button class="test-btn" onclick="randomizeData()">Randomize Data</button>
+    </div>
+
+<script>
+    // Original test data for reset
+    const originalData = {
+        'S01_Vol': '2,100', 'S01_BS': '12', 'S01_UTPct': '96.8%', 'S01_DecPct': '1.2%', 'S01_CF': '4', 'S01_CFPct': '2.9%',
+        'S02_Vol': '1,750', 'S02_BS': '20', 'S02_UTPct': '91.4%', 'S02_DecPct': '2.8%', 'S02_CF': '9', 'S02_CFPct': '6.1%',
+        'S11_Vol': '1,250', 'S11_BS': '15', 'S11_UTPct': '92.5%', 'S11_DecPct': '2.1%', 'S11_CF': '8', 'S11_CFPct': '5.3%',
+        'S12_Vol': '980', 'S12_BS': '22', 'S12_UTPct': '88.7%', 'S12_DecPct': '3.2%', 'S12_CF': '12', 'S12_CFPct': '7.8%',
+    };
+
+    // Transfer functions
+    function readValue(cell, type) {
+        const txt = cell.textContent.replace(/\u00A0/g, "").trim();
+        if (txt === "" || txt === "&nbsp;") return 0;
+
+        if (type === "percent") {
+            const m = txt.match(/-?\d*\.?\d+/);
+            if (!m) return null;
+            const n = parseFloat(m[0]);
+            return Number.isNaN(n) ? null : n;
+        }
+
+        if (type === "float") {
+            const n = parseFloat(txt.replace(/,/g, ""));
+            return Number.isNaN(n) ? null : n;
+        }
+
+        const n = parseInt(txt.replace(/,/g, ""), 10);
+        return Number.isNaN(n) ? null : n;
+    }
+
+    function writeValue(cell, value, type) {
+        if (value === 0) {
+            cell.innerHTML = "&nbsp;";
+            return;
+        }
+        if (type === "percent") {
+            cell.textContent = `${value}%`;
+            return;
+        }
+        if (type === "float") {
+            cell.textContent = Number(value).toLocaleString(undefined, {
+                maximumFractionDigits: 2,
+            });
+            return;
+        }
+        cell.textContent = parseInt(value, 10).toLocaleString();
+    }
+
+    // UNIFIED TRANSFER FUNCTIONS
+    function logTransferStatus(message, type = 'success') {
+        const statusDiv = document.getElementById('transferStatus');
+        const timestamp = new Date().toLocaleTimeString();
+        const className = type === 'error' ? 'status-error' : type === 'warning' ? 'status-warning' : 'status-success';
+
+        statusDiv.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+        statusDiv.scrollTop = statusDiv.scrollHeight;
+    }
+
+    function transferAllMetrics() {
+        const sourceStation = document.getElementById('sourceStation').value;
+        const targetStation = document.getElementById('targetStation').value;
+
+        // Validation
+        if (!sourceStation || !targetStation) {
+            logTransferStatus("❌ Please select both source and target stations", 'error');
+            return false;
+        }
+
+        if (sourceStation === targetStation) {
+            logTransferStatus("⚠️ Source and target stations must be different", 'warning');
+            return false;
+        }
+
+        logTransferStatus(`🚀 Starting unified transfer: ${sourceStation} ⬌ ${targetStation}`, 'success');
+
+        // Define all metric types and their data types
+        const metrics = [
+            { suffix: '_Vol', type: 'int', name: 'Volume' },
+            { suffix: '_BS', type: 'int', name: 'Belt Stops' },
+            { suffix: '_UTPct', type: 'percent', name: 'Uptime %' },
+            { suffix: '_DecPct', type: 'percent', name: 'Decline %' },
+            { suffix: '_CF', type: 'int', name: 'Chute Full' },
+            { suffix: '_CFPct', type: 'percent', name: 'Chute Full %' }
+        ];
+
+        let successCount = 0;
+        let totalMetrics = metrics.length;
+
+        // Transfer each metric
+        for (const metric of metrics) {
+            const sourceId = sourceStation + metric.suffix;
+            const targetId = targetStation + metric.suffix;
+
+            const sourceCell = document.getElementById(sourceId);
+            const targetCell = document.getElementById(targetId);
+
+            if (!sourceCell || !targetCell) {
+                logTransferStatus(`❌ Could not find cells for ${metric.name}: ${sourceId} / ${targetId}`, 'error');
+                continue;
+            }
+
+            const sourceValue = readValue(sourceCell, metric.type);
+            const targetValue = readValue(targetCell, metric.type);
+
+            if (sourceValue === null || targetValue === null) {
+                logTransferStatus(`❌ Invalid values in ${metric.name}: ${sourceId} or ${targetId}`, 'error');
+                continue;
+            }
+
+            // Store before values for logging
+            const beforeSource = sourceCell.textContent;
+            const beforeTarget = targetCell.textContent;
+
+            // Swap values
+            writeValue(targetCell, sourceValue, metric.type);
+            writeValue(sourceCell, targetValue, metric.type);
+
+            logTransferStatus(`✅ ${metric.name}: ${beforeSource} ⬌ ${beforeTarget}`, 'success');
+            successCount++;
+        }
+
+        // Final status
+        if (successCount === totalMetrics) {
+            logTransferStatus(`🎉 TRANSFER COMPLETE! All ${totalMetrics} metrics successfully swapped between ${sourceStation} and ${targetStation}`, 'success');
+        } else {
+            logTransferStatus(`⚠️ PARTIAL TRANSFER: ${successCount}/${totalMetrics} metrics transferred successfully`, 'warning');
+        }
+
+        return successCount === totalMetrics;
+    }
+
+    function resetData() {
+        for (const [id, value] of Object.entries(originalData)) {
+            const cell = document.getElementById(id);
+            if (cell) {
+                cell.textContent = value;
+            }
+        }
+        logTransferStatus("🔄 Test data reset to original values", 'success');
+    }
+
+    function randomizeData() {
+        const stations = ['S01', 'S02', 'S11', 'S12'];
+
+        stations.forEach(station => {
+            document.getElementById(`${station}_Vol`).textContent = (Math.floor(Math.random() * 2000) + 500).toLocaleString();
+            document.getElementById(`${station}_BS`).textContent = Math.floor(Math.random() * 30) + 5;
+            document.getElementById(`${station}_UTPct`).textContent = (Math.random() * 15 + 85).toFixed(1) + '%';
+            document.getElementById(`${station}_DecPct`).textContent = (Math.random() * 5 + 1).toFixed(1) + '%';
+            document.getElementById(`${station}_CF`).textContent = Math.floor(Math.random() * 20) + 1;
+            document.getElementById(`${station}_CFPct`).textContent = (Math.random() * 10 + 2).toFixed(1) + '%';
+        });
+
+        logTransferStatus("🎲 Data randomized", 'success');
+    }
+
+    function runQuickTest() {
+        logTransferStatus("🧪 Running quick test...", 'success');
+
+        // Auto-select stations
+        document.getElementById('sourceStation').value = 'S01';
+        document.getElementById('targetStation').value = 'S11';
+
+        // Transfer
+        transferAllMetrics();
+
+        logTransferStatus("✅ Quick test completed", 'success');
+    }
+
+    // Initialize
+    logTransferStatus("🚀 Unified Transfer test environment loaded!", 'success');
+</script>
+
+</body>
+</html>

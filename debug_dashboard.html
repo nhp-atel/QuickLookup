@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #2c3e50; color: white; }
+        .debug-panel { background: #34495e; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .error { background: #e74c3c; }
+        .success { background: #27ae60; }
+        .warning { background: #f39c12; }
+        button { margin: 5px; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .test-btn { background: #3498db; color: white; }
+        #console { background: #1a1a1a; padding: 10px; border-radius: 5px; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Dashboard Debug Tool</h1>
+
+    <div class="debug-panel">
+        <h3>Function Availability Test</h3>
+        <button class="test-btn" onclick="testFunctions()">🧪 Test All Functions</button>
+        <button class="test-btn" onclick="testElements()">🔍 Test DOM Elements</button>
+        <button class="test-btn" onclick="clearConsole()">🗑️ Clear Console</button>
+    </div>
+
+    <div class="debug-panel">
+        <h3>Quick Function Tests</h3>
+        <button onclick="testFunction('handleEnhancedTransfer')">Test handleEnhancedTransfer</button>
+        <button onclick="testFunction('clearAllSwaps')">Test clearAllSwaps</button>
+        <button onclick="testFunction('refreshSwapDisplay')">Test refreshSwapDisplay</button>
+        <button onclick="testFunction('showSwapDebugInfo')">Test showSwapDebugInfo</button>
+    </div>
+
+    <!-- Test elements similar to main dashboard -->
+    <div class="debug-panel">
+        <h3>Test Controls (Simulating Main Dashboard)</h3>
+        <select id="masterSource">
+            <option value="S01">S1</option>
+            <option value="S02">S2</option>
+        </select>
+        <select id="masterTarget">
+            <option value="S01">S1</option>
+            <option value="S02">S2</option>
+        </select>
+        <button id="transferBtn" onclick="handleEnhancedTransfer()">🔄 PREVIEW & SWAP DATA</button>
+        <button onclick="clearAllSwaps()">🗑️ Clear All Swaps</button>
+    </div>
+
+    <!-- Mock data cells -->
+    <div class="debug-panel">
+        <h3>Mock Data Cells</h3>
+        <table style="border-collapse: collapse;">
+            <tr>
+                <td>S01 Vol: <span id="S01_Vol">1000</span></td>
+                <td>S01 BS: <span id="S01_BS">5</span></td>
+            </tr>
+            <tr>
+                <td>S02 Vol: <span id="S02_Vol">2000</span></td>
+                <td>S02 BS: <span id="S02_BS">10</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="debug-panel">
+        <h3>Console Output</h3>
+        <div id="console"></div>
+    </div>
+
+    <script>
+        // Console logging function
+        function log(message, type = 'info') {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : '';
+            console.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function clearConsole() {
+            document.getElementById('console').innerHTML = '';
+        }
+
+        function testFunction(functionName) {
+            log(`Testing function: ${functionName}`);
+
+            try {
+                if (typeof window[functionName] === 'function') {
+                    log(`✅ ${functionName} is defined and is a function`, 'success');
+
+                    // Try to call it if it's safe
+                    if (functionName === 'refreshSwapDisplay' || functionName === 'showSwapDebugInfo') {
+                        try {
+                            window[functionName]();
+                            log(`✅ ${functionName} executed successfully`, 'success');
+                        } catch (e) {
+                            log(`❌ ${functionName} threw error: ${e.message}`, 'error');
+                        }
+                    } else {
+                        log(`⚠️ ${functionName} not auto-executed for safety`, 'warning');
+                    }
+                } else if (typeof window[functionName] !== 'undefined') {
+                    log(`⚠️ ${functionName} is defined but not a function (type: ${typeof window[functionName]})`, 'warning');
+                } else {
+                    log(`❌ ${functionName} is not defined`, 'error');
+                }
+            } catch (e) {
+                log(`❌ Error testing ${functionName}: ${e.message}`, 'error');
+            }
+        }
+
+        function testFunctions() {
+            log('🧪 Starting comprehensive function test...');
+
+            const functionsToTest = [
+                'handleEnhancedTransfer',
+                'clearAllSwaps',
+                'refreshSwapDisplay',
+                'showSwapDebugInfo',
+                'transferEverythingWithPreview',
+                'showPreviewModal',
+                'atomicSwapStations',
+                'swapStateManager',
+                'swapInterceptor',
+                'readCellValue',
+                'writeCellValue'
+            ];
+
+            functionsToTest.forEach(func => {
+                testFunction(func);
+            });
+
+            log('🏁 Function test completed');
+        }
+
+        function testElements() {
+            log('🔍 Testing DOM elements...');
+
+            const elementsToTest = [
+                'masterSource',
+                'masterTarget',
+                'transferBtn',
+                'S01_Vol',
+                'S01_BS',
+                'S02_Vol',
+                'S02_BS'
+            ];
+
+            elementsToTest.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    log(`✅ Element #${id} found (${element.tagName})`, 'success');
+                } else {
+                    log(`❌ Element #${id} not found`, 'error');
+                }
+            });
+
+            log('🏁 Element test completed');
+        }
+
+        // Try to load the main dashboard functions
+        function loadMainDashboardScript() {
+            log('📥 Attempting to load main dashboard script...');
+
+            const script = document.createElement('script');
+            script.src = 'EnhancedTransfer_Dashboard.html';
+            script.onload = () => log('✅ Main script loaded', 'success');
+            script.onerror = () => log('❌ Failed to load main script', 'error');
+            document.head.appendChild(script);
+        }
+
+        // Check if we're in the context of the main dashboard
+        if (window.location.href.includes('debug_dashboard.html')) {
+            log('🔬 Debug dashboard loaded');
+            log('ℹ️ This is a standalone debug page');
+            log('ℹ️ Functions from main dashboard may not be available');
+        } else {
+            log('📄 Running in main dashboard context');
+        }
+
+        // Auto-run initial tests
+        setTimeout(() => {
+            testElements();
+        }, 500);
+    </script>
+</body>
+</html>

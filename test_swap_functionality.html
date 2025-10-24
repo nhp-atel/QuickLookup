@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Swap Functionality Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #2c3e50; color: white; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background: #27ae60; }
+        .fail { background: #e74c3c; }
+        .warning { background: #f39c12; }
+        table { margin: 20px 0; border-collapse: collapse; }
+        td { border: 1px solid #555; padding: 8px; text-align: center; background: #34495e; }
+        button { margin: 10px 5px; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }
+        .test-btn { background: #3498db; color: white; }
+        .clear-btn { background: #e74c3c; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Enhanced Transfer Dashboard - Swap Functionality Test</h1>
+
+    <div id="testResults"></div>
+
+    <!-- Minimal test table structure -->
+    <table>
+        <tr>
+            <th>Station</th>
+            <th>Volume</th>
+            <th>Belt Stops</th>
+            <th>Uptime %</th>
+        </tr>
+        <tr>
+            <td>S01</td>
+            <td id="S01_Vol">1000</td>
+            <td id="S01_BS">5</td>
+            <td id="S01_UTPct">95.0%</td>
+        </tr>
+        <tr>
+            <td>S02</td>
+            <td id="S02_Vol">2000</td>
+            <td id="S02_BS">10</td>
+            <td id="S02_UTPct">98.5%</td>
+        </tr>
+    </table>
+
+    <button class="test-btn" onclick="runTests()">🧪 Run All Tests</button>
+    <button class="test-btn" onclick="testSwap()">🔄 Test Swap S01↔S02</button>
+    <button class="clear-btn" onclick="clearAllSwaps()">🗑️ Clear Swaps</button>
+
+    <script>
+        // Include the essential swap functionality from our main file
+
+        // METRICS configuration
+        const METRICS = [
+            { key: "Vol", type: "int", mode: "swap", label: "Volume" },
+            { key: "BS", type: "int", mode: "swap", label: "Belt Stops" },
+            { key: "UTPct", type: "percent", mode: "swap", label: "Uptime %" }
+        ];
+
+        // Swap State Manager (simplified version)
+        let swapStateManager = {
+            activeSwaps: new Map(),
+            originalValues: new Map(),
+
+            init() {
+                this.activeSwaps.clear();
+                this.originalValues.clear();
+                console.log('SwapStateManager initialized');
+            },
+
+            registerSwap(stationA, stationB) {
+                console.log(`Registering swap: ${stationA} ↔ ${stationB}`);
+
+                if (!this.originalValues.has(stationA)) {
+                    this.storeOriginalValues(stationA);
+                }
+                if (!this.originalValues.has(stationB)) {
+                    this.storeOriginalValues(stationB);
+                }
+
+                const currentA = this.activeSwaps.get(stationA) || stationA;
+                const currentB = this.activeSwaps.get(stationB) || stationB;
+
+                this.activeSwaps.set(stationA, currentB);
+                this.activeSwaps.set(stationB, currentA);
+
+                console.log('Active swaps:', Array.from(this.activeSwaps.entries()));
+            },
+
+            storeOriginalValues(station) {
+                const values = {};
+                METRICS.forEach(metric => {
+                    const cellId = `${station}_${metric.key}`;
+                    const cell = document.getElementById(cellId);
+                    if (cell) {
+                        values[metric.key] = {
+                            value: readCellValue(cell, metric.type),
+                            displayText: cell.textContent.trim()
+                        };
+                    }
+                });
+                this.originalValues.set(station, values);
+                console.log(`Stored original values for ${station}:`, values);
+            },
+
+            getCurrentMapping(station) {
+                return this.activeSwaps.get(station) || station;
+            },
+
+            isSwapped(station) {
+                return this.activeSwaps.has(station);
+            },
+
+            getAllSwappedStations() {
+                return Array.from(this.activeSwaps.keys());
+            },
+
+            clearAllSwaps() {
+                this.init();
+            },
+
+            getSwapSummary() {
+                const swaps = [];
+                const processed = new Set();
+
+                this.activeSwaps.forEach((target, source) => {
+                    if (!processed.has(source) && !processed.has(target)) {
+                        swaps.push({ source, target });
+                        processed.add(source);
+                        processed.add(target);
+                    }
+                });
+
+                return swaps;
+            }
+        };
+
+        // Helper functions
+        function readCellValue(cell, type) {
+            const txt = cell.textContent.replace(/\u00A0/g, "").trim();
+            if (txt === "" || txt === "&nbsp;") return 0;
+            if (type === "percent") {
+                const m = txt.match(/-?\d*\.?\d+/);
+                if (!m) return null;
+                const n = parseFloat(m[0]);
+                return Number.isNaN(n) ? null : n;
+            }
+            if (type === "float") {
+                const n = parseFloat(txt.replace(/,/g, ""));
+                return Number.isNaN(n) ? null : n;
+            }
+            const n = parseInt(txt.replace(/,/g, ""), 10);
+            return Number.isNaN(n) ? null : n;
+        }
+
+        function writeCellValue(cell, value, type) {
+            if (value === 0) {
+                cell.innerHTML = "&nbsp;";
+                return;
+            }
+            if (type === "percent") {
+                cell.textContent = `${value}%`;
+                return;
+            }
+            if (type === "float") {
+                cell.textContent = Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 });
+                return;
+            }
+            cell.textContent = parseInt(value, 10).toLocaleString();
+        }
+
+        function atomicSwapStations(sourceStation, targetStation) {
+            // Register this swap with the state manager
+            swapStateManager.registerSwap(sourceStation, targetStation);
+
+            // Extract current values for both stations
+            const sourceValues = {};
+            const targetValues = {};
+
+            METRICS.forEach(metric => {
+                const sourceCellId = `${sourceStation}_${metric.key}`;
+                const targetCellId = `${targetStation}_${metric.key}`;
+
+                const sourceCell = document.getElementById(sourceCellId);
+                const targetCell = document.getElementById(targetCellId);
+
+                if (sourceCell && targetCell) {
+                    sourceValues[metric.key] = readCellValue(sourceCell, metric.type);
+                    targetValues[metric.key] = readCellValue(targetCell, metric.type);
+                }
+            });
+
+            // Perform atomic swap
+            let swappedCount = 0;
+            METRICS.forEach(metric => {
+                const sourceCellId = `${sourceStation}_${metric.key}`;
+                const targetCellId = `${targetStation}_${metric.key}`;
+
+                const sourceCell = document.getElementById(sourceCellId);
+                const targetCell = document.getElementById(targetCellId);
+
+                if (sourceCell && targetCell) {
+                    writeCellValue(sourceCell, targetValues[metric.key], metric.type);
+                    writeCellValue(targetCell, sourceValues[metric.key], metric.type);
+                    swappedCount++;
+                }
+            });
+
+            return swappedCount === METRICS.length;
+        }
+
+        // Swap Interceptor (simplified for testing)
+        const swapInterceptor = {
+            restoreSwapsByCurrentState() {
+                console.log('Restoring swaps by analyzing current state...');
+
+                const swapSummary = swapStateManager.getSwapSummary();
+                swapSummary.forEach(swap => {
+                    this.enforceSwapInDOM(swap.source, swap.target);
+                });
+            },
+
+            enforceSwapInDOM(stationA, stationB) {
+                METRICS.forEach(metric => {
+                    const cellA = document.getElementById(`${stationA}_${metric.key}`);
+                    const cellB = document.getElementById(`${stationB}_${metric.key}`);
+
+                    if (cellA && cellB) {
+                        const originalA = swapStateManager.originalValues.get(stationA);
+                        const originalB = swapStateManager.originalValues.get(stationB);
+
+                        if (originalA && originalB && originalA[metric.key] && originalB[metric.key]) {
+                            writeCellValue(cellA, originalB[metric.key].value, metric.type);
+                            writeCellValue(cellB, originalA[metric.key].value, metric.type);
+                        }
+                    }
+                });
+            }
+        };
+
+        // Initialize
+        swapStateManager.init();
+
+        // Test Functions
+        function logResult(test, passed, message) {
+            const resultsDiv = document.getElementById('testResults');
+            const className = passed ? 'pass' : 'fail';
+            resultsDiv.innerHTML += `<div class="test-result ${className}">
+                ${passed ? '✅' : '❌'} ${test}: ${message}
+            </div>`;
+        }
+
+        function testSwap() {
+            console.log('=== Testing Swap Functionality ===');
+
+            // Clear previous state
+            swapStateManager.init();
+
+            // Get original values
+            const s01Vol = document.getElementById('S01_Vol').textContent;
+            const s02Vol = document.getElementById('S02_Vol').textContent;
+
+            console.log(`Before swap - S01: ${s01Vol}, S02: ${s02Vol}`);
+
+            // Perform swap
+            const success = atomicSwapStations('S01', 'S02');
+
+            // Get new values
+            const s01VolAfter = document.getElementById('S01_Vol').textContent;
+            const s02VolAfter = document.getElementById('S02_Vol').textContent;
+
+            console.log(`After swap - S01: ${s01VolAfter}, S02: ${s02VolAfter}`);
+
+            logResult('Swap Execution', success, `Swap completed successfully`);
+            logResult('Value Exchange', s01VolAfter === s02Vol && s02VolAfter === s01Vol,
+                     `Values exchanged correctly: S01 now has ${s01VolAfter}, S02 now has ${s02VolAfter}`);
+        }
+
+        function simulateDataReload() {
+            console.log('=== Simulating Data Reload ===');
+
+            // Simulate clearing and reloading data (like AJAX would do)
+            document.getElementById('S01_Vol').textContent = '1000';
+            document.getElementById('S01_BS').textContent = '5';
+            document.getElementById('S01_UTPct').textContent = '95.0%';
+
+            document.getElementById('S02_Vol').textContent = '2000';
+            document.getElementById('S02_BS').textContent = '10';
+            document.getElementById('S02_UTPct').textContent = '98.5%';
+
+            console.log('Data reset to original values');
+
+            // Now restore swaps
+            setTimeout(() => {
+                swapInterceptor.restoreSwapsByCurrentState();
+
+                // Check if swaps were restored
+                const s01Vol = document.getElementById('S01_Vol').textContent;
+                const s02Vol = document.getElementById('S02_Vol').textContent;
+
+                const swapSummary = swapStateManager.getSwapSummary();
+                const shouldBeSwapped = swapSummary.length > 0;
+
+                if (shouldBeSwapped) {
+                    const isRestored = s01Vol === '2,000' && s02Vol === '1,000';
+                    logResult('Swap Persistence', isRestored,
+                             `Swaps ${isRestored ? 'restored' : 'NOT restored'} after data reload`);
+                } else {
+                    logResult('Swap Persistence', true, 'No active swaps to restore');
+                }
+            }, 100);
+        }
+
+        function runTests() {
+            document.getElementById('testResults').innerHTML = '<h2>🧪 Test Results:</h2>';
+
+            console.log('=== Starting All Tests ===');
+
+            // Test 1: Basic swap functionality
+            testSwap();
+
+            // Test 2: Persistence after simulated data reload
+            setTimeout(() => {
+                simulateDataReload();
+            }, 500);
+
+            // Test 3: State manager functionality
+            setTimeout(() => {
+                const swapSummary = swapStateManager.getSwapSummary();
+                logResult('State Manager', swapSummary.length > 0,
+                         `State manager tracking ${swapSummary.length} active swaps`);
+
+                const swappedStations = swapStateManager.getAllSwappedStations();
+                logResult('Swap Tracking', swappedStations.includes('S01') && swappedStations.includes('S02'),
+                         `Tracking stations: ${swappedStations.join(', ')}`);
+            }, 1000);
+        }
+
+        function clearAllSwaps() {
+            swapStateManager.clearAllSwaps();
+
+            // Reset to original values
+            document.getElementById('S01_Vol').textContent = '1000';
+            document.getElementById('S01_BS').textContent = '5';
+            document.getElementById('S01_UTPct').textContent = '95.0%';
+
+            document.getElementById('S02_Vol').textContent = '2000';
+            document.getElementById('S02_BS').textContent = '10';
+            document.getElementById('S02_UTPct').textContent = '98.5%';
+
+            logResult('Clear Swaps', true, 'All swaps cleared and original values restored');
+        }
+
+        // Auto-run basic test on page load
+        setTimeout(() => {
+            document.getElementById('testResults').innerHTML = '<h2>📊 Ready for testing!</h2>';
+            logResult('Initialization', true, 'Swap functionality loaded and ready');
+        }, 500);
+    </script>
+</body>
+</html>
